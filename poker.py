@@ -3,6 +3,7 @@
 
 from definitions import *
 from card import Card, CardData
+from evaluation_rules import EvaluationRules
 
 MAX_CARDS = 5
 
@@ -62,7 +63,7 @@ def _is_straight(cards: list[Card], fingers=5, skipping=False) -> bool:
 
 
 
-def asses_poker_hand(cards: list[Card], evaluation_rules: HandEvaluationRules) -> tuple[HandType, list[Card]]:
+def asses_poker_hand(cards: list[Card], evaluation_rules: EvaluationRules) -> tuple[HandType, list[Card]]:
     '''asses poker hand, return type and playing cards'''
 
     is_flush = _is_flush(cards, 5)

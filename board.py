@@ -5,21 +5,17 @@ from card import Card
 from joker import Joker
 from poker import asses_poker_hand
 from definitions import *
-
-@dataclass
-class BoardData:
-    hand_size: int = 8
-    hands_play: int = 4
-    hands_discard: int = 3
+from evaluation_rules import EvaluationRules
 
 
 class Board:
     def __init__(self):
-        self.BoardData = BoardData()
+        self.data = BoardData()
         self.hand_cards: list[Card] = []
         self.selected_cards: list[Card] = []
         self.played_cards: list[Card] = []
         self.jokers: list[Joker] = []
+        self.evaluation_rules = EvaluationRules()
 
         self.chips: int = 0
         self.mult: float = 1
@@ -29,11 +25,13 @@ class Board:
         self.calc_mode: ClacMode = ClacMode.BEST
 
     def play(self):
+        self.data.remaining_hands -= 1
+
         # handle evaluation rules
-        evaluation_rules = HandEvaluationRules()
+        self.evaluation_rules = EvaluationRules()
         for joker in self.jokers:
-            joker.change_evaluation_rules(evaluation_rules)
-        self.current_hand_type, self.played_cards = asses_poker_hand(self.selected_cards, evaluation_rules)
+            joker.change_evaluation_rules(self)
+        self.current_hand_type, self.played_cards = asses_poker_hand(self.selected_cards, self.evaluation_rules)
 
         # start from hand type base level
         chips, mult = get_hand_level_chips_mult(self.current_hand_type, self.levels[self.current_hand_type])
@@ -69,6 +67,9 @@ class Board:
 
     def get_hand_cards(self) -> list[Card]:
         return self.hand_cards
+    
+    def get_played_cards(self) -> list[Card]:
+        return self.played_cards
 
     def get_jokers(self) -> list['Joker']:
         return self.jokers
@@ -84,10 +85,18 @@ class Board:
     
     def get_mode(self) -> ClacMode:
         return self.calc_mode
+    
+    def get_evaluation_rules(self) -> EvaluationRules:
+        return self.evaluation_rules
+    
+    def get_data(self) -> BoardData:
+        return self.data
 
-    def evaluate_card_triggers_played(self, card: Card):
+    def evaluate_card_triggers_played(self, card: Card) -> int:
         # debuffed might go here
-        base = 1
+        triggers = 1
         if card.data.seal == Seal.RED:
-            base += 1
-        return base
+            triggers += 1
+        for joker in self.jokers:
+            triggers += joker.get_card_retriggers(card, self)
+        return triggers

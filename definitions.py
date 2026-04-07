@@ -119,6 +119,10 @@ def get_hand_level_chips_mult(hand_type: HandType, level: int) -> tuple[int, int
     return chips, mult
 
 @dataclass
-class HandEvaluationRules:
-    straight_skip: bool = False
-    fingers: int = 5
+class BoardData:
+    hand_size: int = 8
+    total_hands: int = 4
+    remaining_hands: int = 4
+    discards: int = 3
+    remaining_discards: int = 3
+    money: int = 10

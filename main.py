@@ -24,8 +24,11 @@ def main():
         ]
     
     board.jokers = [
-        JokerShortcut(),
-        JokerFourFingers(),
+        JokerPareidolia(),
+        JokerHangingChad(),
+        JokerSockAndBuskin(),
+        JokerSeltzer(),
+        JokerDusk(),
     ]
 
     board.play()
