@@ -10,7 +10,7 @@ def main():
 
     board.hand_cards = [
         Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)),
-        Card(CardData(suit=Suit.HEARTS, rank=Rank.KING)),
+        Card(CardData(suit=Suit.HEARTS, rank=Rank.THREE)),
         Card(CardData(suit=Suit.HEARTS, rank=Rank.KING)),
         Card(CardData(suit=Suit.HEARTS, rank=Rank.KING)),
         ]
@@ -24,11 +24,8 @@ def main():
         ]
     
     board.jokers = [
-        JokerPareidolia(),
-        JokerHangingChad(),
-        JokerSockAndBuskin(),
-        JokerSeltzer(),
-        JokerDusk(),
+        JokerRaisedFist(),
+        
     ]
 
     board.play()

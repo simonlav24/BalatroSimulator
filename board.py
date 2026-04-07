@@ -15,6 +15,7 @@ class Board:
         self.selected_cards: list[Card] = []
         self.played_cards: list[Card] = []
         self.jokers: list[Joker] = []
+        self.deck: list[Card] = []
         self.evaluation_rules = EvaluationRules()
 
         self.chips: int = 0
@@ -92,6 +93,9 @@ class Board:
     def get_data(self) -> BoardData:
         return self.data
 
+    def get_selected_cards(self) -> list[Card]:
+        return self.selected_cards
+
     def evaluate_card_triggers_played(self, card: Card) -> int:
         # debuffed might go here
         triggers = 1
@@ -100,3 +104,6 @@ class Board:
         for joker in self.jokers:
             triggers += joker.get_card_retriggers(card, self)
         return triggers
+
+    def get_full_deck(self) -> list[Card]:
+        return self.deck
