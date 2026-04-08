@@ -16,16 +16,15 @@ def main():
         ]
     
     board.selected_cards = [
-        Card(CardData(suit=Suit.HEARTS, rank=Rank.THREE)),
-        Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
-        Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN)),
-        Card(CardData(suit=Suit.SPADES, rank=Rank.NINE)),
-        Card(CardData(suit=Suit.HEARTS, rank=Rank.JACK)),
+        Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
+        Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
+        Card(CardData(suit=Suit.CLUBS, rank=Rank.SIX)),
+        Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SEVEN)),
+        Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
         ]
     
     board.jokers = [
         JokerRaisedFist(),
-        
     ]
 
     board.play()

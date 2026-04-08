@@ -33,6 +33,11 @@ class Board:
         for joker in self.jokers:
             joker.change_evaluation_rules(self)
         self.current_hand_type, self.played_cards = asses_poker_hand(self.selected_cards, self.evaluation_rules)
+        if self.evaluation_rules.play_all_cards:
+            self.played_cards = self.selected_cards
+
+        print(f'played hand: {self.current_hand_type}')
+        print(f'played cards: {self.played_cards}')
 
         # start from hand type base level
         chips, mult = get_hand_level_chips_mult(self.current_hand_type, self.levels[self.current_hand_type])
@@ -62,7 +67,7 @@ class Board:
         # final calculation
         final_chips_best = int(self.chips * self.mult)
 
-        print(f'Played hand: {self.current_hand_type}')
+        # print(f'Played hand: {self.current_hand_type}')
         print(f'Score: {final_chips_best}')
 
 

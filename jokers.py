@@ -323,7 +323,7 @@ class JokerFourFingers(Joker):
 
 
 
-class JokerPhotograph(Joker):
+class JokerPhotograph(Joker): ############# make it better
     def __init__(self):
         super().__init__(name='Photograph')
         self.data.cost = 5

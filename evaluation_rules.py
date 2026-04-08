@@ -10,6 +10,7 @@ class EvaluationRules:
     straight_skip: bool = False
     fingers: int = 5
     all_face: bool = False
+    play_all_cards: bool = False
 
     def is_face_card(self, card: Card) -> bool:
         if self.all_face:
