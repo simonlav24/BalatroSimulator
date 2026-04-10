@@ -1,163 +1,195 @@
 
 
+from enum import Enum
+from collections import Counter
 
 from definitions import *
 from card import Card, CardData
 from evaluation_rules import EvaluationRules
 
-MAX_CARDS = 5
+class HandEvaluator:
+    def __init__(self, cards: list[Card], evaluation_rules: EvaluationRules):
+        self.cards = [card for card in cards if card.get_rank() != Rank.NONE]
+        self.eval = evaluation_rules
 
-def _is_flush(cards: list[Card], fingers=5) -> tuple[bool, Suit, list[Card]]:
-    is_flush = False
-    cards_playing = []
-    suits = [card.get_suit() for card in cards]
-    any_count = [[suit for suit in suits if (suit == test_suit) or (suit == Suit.ANY)] for test_suit in Suit]
-    maximum = max(any_count, key=len)
-    if len(maximum) >= fingers:
-        is_flush = True
-    max_set = set(maximum)
-    if Suit.ANY in max_set:
-        max_set.remove(Suit.ANY)
-    winning_suit = next(iter(max_set))
-    if len(max_set) == 0:
-        cards_playing = cards
-    else:
-        cards_playing = [card for card in cards if card.is_suit(winning_suit)]
-    return is_flush, winning_suit, cards_playing
+        self.ranks = sorted((card.get_rank().value for card in cards))
+        self.suits = {self.eval.get_suit(card): 0 for card in cards if self.eval.get_suit(card) != Suit.ANY}
+        for card in cards:
+            if self.eval.get_suit(card) == Suit.ANY:
+                for key in self.suits.keys():
+                    self.suits[key] += 1
+                continue
+            self.suits[self.eval.get_suit(card)] += 1
+        self.rank_counts = Counter(self.ranks)
+        self.ranks = sorted(set(self.ranks))
 
+    # =================== utilities ===================
+    def _get_flush(self, fingers) -> Suit | None:
+        for suit, count in self.suits.items():
+            if count >= fingers:
+                return suit
+        return None
 
-def _is_count_max_ranks(cards: list[Card], amount: int) -> tuple[bool, Rank]:
-    ranks = {}
-    for card in cards:
-        if card.get_rank() == Rank.NONE:
-            continue
-        if card.get_rank() not in ranks:
-            ranks[card.get_rank()] = 0
-        ranks[card.get_rank()] += 1
-    return any(rank == amount for rank in ranks.values()), next(iter([rank for rank, count in ranks.items() if count == amount]), None)
+    def _get_straight(self) -> list[Card] | None:
+        if len(self.cards) < self.eval.fingers:
+            return None
+        straight_ranks = self.ranks.copy()
+        valid_diffs = [1, 2] if self.eval.straight_skip else [1]
+        
+        checks = [straight_ranks]
+        if 14 in straight_ranks:
+            second = straight_ranks.copy()
+            second.remove(14)
+            second.insert(0, 1)
+            checks.append(second)
 
-def _is_house(cards: list[Card]) -> bool:
-    ranks = {}
-    for card in cards:
-        if card.get_rank() == Rank.NONE:
-            continue
-        if card.get_rank() not in ranks:
-            ranks[card.get_rank()] = 0
-        ranks[card.get_rank()] += 1
-    ranks_values = list(ranks.values())
-    return len(ranks) == 2 and any([ranks_values[0] == 2 and ranks_values[1] == 3, ranks_values[0] == 3 and ranks_values[1] == 2])
+        is_straight = False
+        for check in checks:
+            diffs = [b - a in valid_diffs for a, b in zip(check, check[1:])]
+            while diffs and not diffs[0]:
+                check.pop(0)
+                diffs.pop(0)
+            while diffs and not diffs[-1]:
+                check.pop()
+                diffs.pop()
+            
+            if not all(diffs) or len(diffs) < self.eval.fingers - 1:
+                continue
+            is_straight = True
+            straight_ranks = check
 
-def _check_sequence(cards: list[Card], skipping=False) -> bool:
-    prev_rank = cards[0].get_rank().value
-    for card in cards[1:]:
-        if not ((card.get_rank().value == prev_rank + 1) or (skipping and card.get_rank().value == prev_rank + 2)):
-            return False
-        prev_rank = card.get_rank().value
-    return True 
+        if not is_straight:
+            return None
 
-def _is_straight(cards: list[Card], fingers=5, skipping=False) -> tuple[bool, list[Card]]:
-    used_ranks = [Rank.NONE]
-    unique_ranked_cards: list[Card] = []
-    for card in cards:
-        if card.get_rank() in used_ranks:
-            continue
-        else:
-            used_ranks.append(card.get_rank())
-            unique_ranked_cards.append(card)
+        if 1 in straight_ranks:
+            straight_ranks.remove(1)
+            straight_ranks.append(14)
 
-    unique_ranked_cards.sort(key=lambda x: x.get_rank().value)
-    if _check_sequence(unique_ranked_cards):
-        return True, list(set(cards).intersection(unique_ranked_cards))
-    if fingers < 5:
-        if _check_sequence(unique_ranked_cards[:-1]):
-            return True, [card for card in cards if card in unique_ranked_cards[:-1]]
-        if _check_sequence(unique_ranked_cards[1:]):
-            return True, [card for card in cards if card in unique_ranked_cards[1:]]
-    return False, None
+        straight = []
+        used = []
+        for card in self.cards:
+            rank = card.get_rank().value
+            if rank not in used and rank in straight_ranks:
+                straight.append(card)
+                used.append(rank)
+        return straight
 
+    # =================== checkers ===================
+    def check_flush_five(self) -> list[Card] | None:
+        flush_suit = self._get_flush(5)
+        is_five_of_a_kind = any(count == 5 for count in self.rank_counts.values())
+        if flush_suit != None and is_five_of_a_kind:
+            return self.cards
+        return None
+
+    def check_five_of_a_kind(self) -> list[Card] | None:
+        if any(count == 5 for count in self.rank_counts.values()):
+            return self.cards
+        return None
+
+    def check_flush_house(self) -> list[Card] | None:
+        is_house = all(i in self.rank_counts.values() for i in [2, 3])
+        flush_suit = self._get_flush(5)
+        if is_house and flush_suit != None:
+            return self.cards
+        return None
+
+    def check_straight_flush(self) -> list[Card] | None:
+        flush_suit = self._get_flush(self.eval.fingers)
+        straight_cards = self._get_straight()
+
+        if (
+            straight_cards != None and flush_suit != None and
+            all([self.eval.is_suit(card, flush_suit) for card in straight_cards])
+        ):
+            return straight_cards
+        return None
+
+    def check_four_of_a_kind(self) -> list[Card] | None:
+        rank = next((rank for rank, count in self.rank_counts.items() if count == 4), None)
+        if rank is not None:
+            return [card for card in self.cards if card.get_rank().value == rank]
+        return None
+
+    def check_full_house(self) -> list[Card] | None:
+        if all(i in self.rank_counts.values() for i in [2, 3]):
+            return self.cards
+        return None
+
+    def check_flush(self) -> list[Card] | None:
+        flush_suit = self._get_flush(self.eval.fingers)
+        if flush_suit != None:
+            return [card for card in self.cards if self.eval.is_suit(card, flush_suit)]
+        return None
+    
+    def check_straight(self) -> list[Card] | None:
+        straight_cards = self._get_straight()
+        if straight_cards is not None:
+            return straight_cards
+        return None
+    
+    def check_three_of_a_kind(self) -> list[Card] | None:
+        rank = next((rank for rank, count in self.rank_counts.items() if count == 3), None)
+        if rank is not None:
+            return [card for card in self.cards if card.get_rank().value == rank]
+        return None
+    
+    def check_two_pair(self) -> list[Card] | None:
+        pairs_rank = [rank for rank, count in self.rank_counts.items() if count == 2]
+        if len(pairs_rank) == 2:
+            return [card for card in self.cards if card.get_rank().value in pairs_rank]
+        return None
+    
+    def check_pair(self) -> list[Card] | None:
+        rank = next((rank for rank, count in self.rank_counts.items() if count == 2), None)
+        if rank is not None:
+            return [card for card in self.cards if card.get_rank().value == rank]
+        return None
+    
+    def check_high_card(self) -> list[Card] | None:
+        max_rank = self.ranks[-1]
+        for card in self.cards:
+            if card.get_rank().value == max_rank:
+                return [card]
+        return None
+
+    def get_evaluation(self) -> tuple[HandType, list[Card]]:
+        checks = [
+            (HandType.FLUSH_FIVE, self.check_flush_five),
+            (HandType.FIVE_OF_A_KIND, self.check_five_of_a_kind),
+            (HandType.FLUSH_HOUSE, self.check_flush_house),
+            (HandType.STRAIGHT_FLUSH, self.check_straight_flush),
+            (HandType.FOUR_OF_A_KIND, self.check_four_of_a_kind),
+            (HandType.FULL_HOUSE, self.check_full_house),
+            (HandType.FLUSH, self.check_flush),
+            (HandType.STRAIGHT, self.check_straight),
+            (HandType.THREE_OF_A_KIND, self.check_three_of_a_kind),
+            (HandType.TWO_PAIR, self.check_two_pair),
+            (HandType.PAIR, self.check_pair),
+            (HandType.HIGH_CARD, self.check_high_card),
+        ]
+        for hand_type, check in checks:
+            played_cards = check()
+            if played_cards != None:
+                return hand_type, played_cards
+        return None, None
 
 
 def asses_poker_hand(cards: list[Card], evaluation_rules: EvaluationRules) -> tuple[HandType, list[Card]]:
-    '''asses poker hand, return type and playing cards'''
-
-    is_flush, _, _ = _is_flush(cards, 5)
-    is_same_rank, _ = _is_count_max_ranks(cards, 5)
-
-    # flush five
-    if len(cards) == MAX_CARDS and is_same_rank and is_flush:
-        return (HandType.FLUSH_FIVE, cards)
-    
-    # five of a kind
-    if len(cards) == MAX_CARDS and is_same_rank:
-        return (HandType.FIVE_OF_A_KIND, cards)
-
-    # flush house
-    is_house = _is_house(cards)
-    if is_house and is_flush:
-        return (HandType.FLUSH_HOUSE, cards)
-    
-    is_flush, suit, flush_cards = _is_flush(cards, evaluation_rules.fingers)
-    is_straight, straight_cards = _is_straight(cards, evaluation_rules.fingers, evaluation_rules.straight_skip)
-
-    # straight flush
-    if (
-        is_flush and is_straight and
-        all([card.is_suit(suit) for card in straight_cards])
-    ):
-        return (HandType.STRAIGHT_FLUSH, straight_cards)
-
-    # four of a kind
-    is_four_of_a_kind, rank = _is_count_max_ranks(cards, 4)
-    if is_four_of_a_kind:
-        return (HandType.FOUR_OF_A_KIND, [card for card in cards if card.is_rank(rank)])
-
-    # full house
-    if is_house:
-        return (HandType.FULL_HOUSE, cards)
-
-    # flush
-    if is_flush:
-        return (HandType.FLUSH, flush_cards)
-    
-    # straight
-    if is_straight:
-        return (HandType.STRAIGHT, straight_cards)
-    
-    # three of a kind
-    is_three_of_a_kind, rank = _is_count_max_ranks(cards, 3)
-    if is_three_of_a_kind:
-        return (HandType.THREE_OF_A_KIND, [card for card in cards if card.is_rank(rank)])
-    
-    # two pair
-    ranks = {}
-    for card in cards:
-        if card.get_rank() == Rank.NONE:
-            continue
-        if card.get_rank() not in ranks:
-            ranks[card.get_rank()] = 0
-        ranks[card.get_rank()] += 1
-    ranks = [rank for rank, count in ranks.items() if count == 2]
-    if len(ranks) == 2:
-        return (HandType.TWO_PAIR, [card for card in cards if card.get_rank() in ranks])
-    
-    # pair
-    if len(ranks) == 1:
-        return (HandType.PAIR, [card for card in cards if card.get_rank() in ranks])
-    
-    # high card
-    return (HandType.HIGH_CARD, [max(cards, key=lambda x: x.get_rank().value)])
+    evaluator = HandEvaluator(cards, evaluation_rules)
+    return evaluator.get_evaluation()
 
 
 if __name__ == '__main__':
-    # test hand evaluation
-    from random import choice
-    
-    cards = [
-        Card(CardData(suit=Suit.HEARTS, rank=Rank.THREE, enhancement=Enhancement.WILD)),
-        Card(CardData(suit=Suit.SPADES, rank=Rank.TWO, enhancement=Enhancement.WILD)),
-        Card(CardData(suit=Suit.HEARTS, rank=Rank.KING, )),
-        Card(CardData(suit=Suit.SPADES, rank=Rank.KING, enhancement=Enhancement.WILD)),
-        Card(CardData(suit=Suit.CLUBS, rank=Rank.KING,)),
-    ]
+    h = HandEvaluator(
+        [
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.SIX)),
+            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.EIGHT)),
+        ],
+        EvaluationRules(reds_same_suit=True)
+    )
 
-    print(asses_poker_hand(cards))
+    

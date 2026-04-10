@@ -35,6 +35,8 @@ class Board:
         self.current_hand_type, self.played_cards = asses_poker_hand(self.selected_cards, self.evaluation_rules)
         if self.evaluation_rules.play_all_cards:
             self.played_cards = self.selected_cards
+        # add stone cards
+        self.played_cards += [card for card in self.selected_cards if card not in self.played_cards and card.data.enhancement == Enhancement.STONE]
 
         print(f'played hand: {self.current_hand_type}')
         print(f'played cards: {self.played_cards}')
