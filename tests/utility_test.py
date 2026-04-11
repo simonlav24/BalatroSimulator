@@ -25,7 +25,7 @@ class TestEvaluationRules(unittest.TestCase):
         self.assertFalse(e.is_suit(Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE, enhancement=Enhancement.STONE)), Suit.ANY))
 
     def test_is_suit_reds(self):
-        e = EvaluationRules(reds_same_suit=True)
+        e = EvaluationRules(smeared=True)
         
         self.assertTrue(e.is_suit(Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)), Suit.HEARTS))
         self.assertTrue(e.is_suit(Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)), Suit.DIAMONDS))
@@ -33,7 +33,7 @@ class TestEvaluationRules(unittest.TestCase):
         self.assertFalse(e.is_suit(Card(CardData(suit=Suit.SPADES, rank=Rank.ACE)), Suit.HEARTS))
         self.assertFalse(e.is_suit(Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)), Suit.HEARTS))
         self.assertTrue(e.is_suit(Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)), Suit.CLUBS))
-        self.assertFalse(e.is_suit(Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)), Suit.SPADES))
+        self.assertTrue(e.is_suit(Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)), Suit.SPADES))
 
     def test_face_cards(self):
         e = EvaluationRules()

@@ -29,12 +29,16 @@ class BoardVision(Protocol):
     def get_levels_table(self) -> dict[HandType, dict[str, int]]: ...
     def get_current_hand_type(self) -> HandType: ...
 
+
 class Joker:
     def __init__(self, name: str):
         self.data = JokerData(name=name)
         self.active: bool = True
         self.rarity: Rarity = Rarity.COMMON
     
+    def __repr__(self):
+        return self.data.name
+
     def trigger_on_start_hand(self, board: BoardVision) -> None:
         ...
 
@@ -59,6 +63,9 @@ class Joker:
     def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return 0
     
+    def trigger_on_end_round(self, board: BoardVision) -> None:
+        ...
+    
     def trigger_edition(self, board: BoardVision) -> None:
         if self.data.edition == Edition.FOIL:
             board.add_chips(50)
@@ -66,3 +73,15 @@ class Joker:
             board.add_mult(10)
         elif self.data.edition == Edition.POLYCHROME:
             board.add_time_mult(1.5)
+    
+    def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+        ...
+    
+    def on_sell(self, board: BoardVision) -> None:
+        ...
+    
+    def on_added_card(self, board: BoardVision) -> None:
+        ...
+    
+    def on_blind_selected(self, Board: BoardVision) -> None:
+        ...

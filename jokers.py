@@ -804,7 +804,7 @@ class JokerVampire(Joker):
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         if self.enhancements > 0:
-            board.add_time_mult(self.enhancements * 0.1)
+            board.add_time_mult(1.0 + self.enhancements * 0.1)
             logger.info(f'{self.data.name} added {self.enhancements * 0.1} time-mult')
         super().trigger_on_end_hand(board)
 
@@ -867,19 +867,238 @@ class JokerRocket(Joker):
         self.rarity = Rarity.UNCOMMON
 
 
+class JokerObelisk(Joker):
+    def __init__(self):
+        super().__init__(name='Obelisk')
+        self.data.cost = 8
+        self.rarity = Rarity.RARE
+        self.consecutive_played = 0
+    
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        if self.consecutive_played > 0:
+            board.add_time_mult(self.consecutive_played * 0.2)
+            logger.info(f'{self.data.name} added {self.consecutive_played * 0.2} time-mult')
+        super().trigger_on_end_hand(board)
 
 
+class JokerMidasMask(Joker):
+    def __init__(self):
+        super().__init__(name='Midas Mask')
+        self.data.cost = 7
+        self.rarity = Rarity.UNCOMMON
+    
+    def trigger_on_start_hand(self, board):
+        for card in board.get_selected_cards():
+            if board.get_evaluation_rules().is_face_card(card):
+                card.data.enhancement = Enhancement.GOLD
+        super().trigger_on_start_hand(board)
+        
+
+class JokerLuchador(Joker):
+    def __init__(self):
+        super().__init__(name='Luchador')
+        self.data.cost = 5
+        self.rarity = Rarity.UNCOMMON
 
 
+class JokerPhotograph(Joker):
+    def __init__(self):
+        super().__init__(name='Photograph')
+        self.data.cost = 5
+    
+    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
+        played_cards = board.get_played_cards()
+        first_face = next((card for card in played_cards if board.get_evaluation_rules().is_face_card(card)), None)
+        if card is first_face:
+            board.add_time_mult(2)
+            logger.info(f'{self.data.name} added 2 time-mult')
+        super().trigger_on_play_card(card, board)
 
 
+class JokerGiftCard(Joker):
+    def __init__(self):
+        super().__init__(name='Gift Card')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+        
+
+class JokerTurtleBean(Joker):
+    def __init__(self):
+        super().__init__(name='Turtle Bean')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
 
 
+class JokerErosion(Joker):
+    def __init__(self):
+        super().__init__(name='Erosion')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        start = board.get_data().starting_deck_size
+        current = len(board.get_full_deck())
+        if current < start:
+            mult = 4 * start - current
+            board.add_mult(mult)
+            logger.info(f'{self.data.name} added {mult} mult')
+        super().trigger_on_end_hand(board)
 
 
+class JokerReservedParking(Joker):
+    def __init__(self):
+        super().__init__(name='Reserved Parking')
+        self.data.cost = 6
 
 
+class JokerMailInRebate(Joker):
+    def __init__(self):
+        super().__init__(name='Mail-In Rebate')
+        self.data.cost = 4
 
+
+class JokerTotheMoon(Joker):
+    def __init__(self):
+        super().__init__(name='To the Moon')
+        self.data.cost = 5
+        self.rarity = Rarity.UNCOMMON
+
+
+class JokerHallucination(Joker):
+    def __init__(self):
+        super().__init__(name='Hallucination')
+        self.data.cost = 4
+
+
+class JokerFortuneTeller(Joker):
+    def __init__(self):
+        super().__init__(name='Fortune Teller')
+        self.data.cost = 6
+        self.mult = 0
+    
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        if self.mult > 0:
+            board.add_mult(self.mult)
+            logger.info(f'{self.data.name} added {self.mult} mult')
+        super().trigger_on_end_hand(board)
+
+
+class JokerJuggler(Joker):
+    def __init__(self):
+        super().__init__(name='Juggler')
+        self.data.cost = 4
+
+
+class JokerDrunkard(Joker):
+    def __init__(self):
+        super().__init__(name='Drunkard')
+        self.data.cost = 4
+
+
+class JokerStoneJoker(Joker):
+    def __init__(self):
+        super().__init__(name='Stone Joker')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        chips = 25 * sum(card for card in board.get_full_deck() if card.data.enhancement == Enhancement.STONE)
+        if chips > 0:
+            board.add_chips(chips)
+            logger.info(f'{self.data.name} added {chips} chips')
+        super().trigger_on_end_hand(board)
+
+
+class JokerGoldenJoker(Joker):
+    def __init__(self):
+        super().__init__(name='Golden Joker')
+        self.data.cost = 6
+
+
+class JokerLuckyCat(Joker):
+    def __init__(self):
+        super().__init__(name='Lucky Cat')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+        self.lucky_hits = 0
+    
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        if self.lucky_hits > 0:
+            board.add_time_mult(self.lucky_hits * 0.25)
+            logger.info(f'{self.data.name} added {self.lucky_hits * 0.25} time-mult')
+        super().trigger_on_end_hand(board)
+
+
+class JokerBaseballCard(Joker):
+    def __init__(self):
+        super().__init__(name='Baseball Card')
+        self.data.cost = 8
+        self.rarity = Rarity.RARE
+    
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        for joker in board.get_jokers():
+            if joker.rarity == Rarity.UNCOMMON:
+                board.add_time_mult(1.5)
+                logger.info(f'{self.data.name} added 1.5 time-mult')
+        super().trigger_on_end_hand(board)
+
+
+class JokerBull(Joker):
+    def __init__(self):
+        super().__init__(name='Bull')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+    
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        chips = 2 * board.get_data().money
+        if chips > 0:
+            board.add_chips(chips)
+            logger.info(f'{self.data.name} added {chips} chips')
+        super().trigger_on_end_hand(board)
+
+
+class JokerDietCola(Joker):
+    def __init__(self):
+        super().__init__(name='Diet Cola')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+
+
+class JokerTradingCard(Joker):
+    def __init__(self):
+        super().__init__(name='Trading Card')
+        self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
+
+
+class JokerFlashCard(Joker):
+    def __init__(self):
+        super().__init__(name='Flash Card')
+        self.data.cost = 5
+        self.rarity = Rarity.UNCOMMON
+        self.mult = 0
+
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        if self.mult > 0:
+            board.add_mult(self.mult)
+            logger.info(f'{self.data.name} added {self.mult} mult')
+        super().trigger_on_end_hand(board)
+
+
+class JokerPopcorn(Joker):
+    def __init__(self):
+        super().__init__(name='Popcorn')
+        self.data.cost = 5
+        self.mult = 20
+
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        if self.mult > 0:
+            board.add_mult(self.mult)
+            logger.info(f'{self.data.name} added {self.mult} mult')
+        super().trigger_on_end_hand(board)
+    
+    def trigger_on_end_round(self, board: BoardVision) -> None:
+        self.mult -= 4
 
 
 
@@ -909,6 +1128,7 @@ class JokerSockAndBuskin(Joker):
     def __init__(self):
         super().__init__(name='Sock and Buskin')
         self.data.cost = 6
+        self.rarity = Rarity.UNCOMMON
 
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         if board.get_evaluation_rules().is_face_card(card):
@@ -916,30 +1136,12 @@ class JokerSockAndBuskin(Joker):
         return 0
 
 
-class JokerPhotograph(Joker): ############# todo: make it better
-    def __init__(self):
-        super().__init__(name='Photograph')
-        self.data.cost = 5
-        self.first_card: Card | None = None
-
-    def trigger_on_start_hand(self, board: BoardVision) -> None:
-        cards = board.get_played_cards()
-        for card in cards:
-            if board.get_evaluation_rules().is_face_card(card):
-                self.first_card = card
-                break
-    
-    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
-        if self.first_card and card == self.first_card:
-            board.add_time_mult(2)
-
-    def trigger_on_end_hand(self, board: BoardVision) -> None:
-        self.first_card = None
 
 
-class JokerBlueprint(Joker):
-    def __init__(self):
-        super().__init__(name='Blueprint')
+
+class JokerCopier(Joker):
+    def __init__(self, name: str):
+        super().__init__(name=name)
         self.data.cost = 10
         self.rarity = Rarity.RARE
         self.copied_joker: Joker = Joker('dummy')
@@ -959,15 +1161,47 @@ class JokerBlueprint(Joker):
     def trigger_on_discard_cards(self, cards: list[Card], board: BoardVision) -> None:
         self.copied_joker.trigger_on_discard_cards(cards, board)
 
-    def change_evaluation_rules(self, board: BoardVision) -> None:
-        # get copied
-        jokers = board.get_jokers()
-        self_index = jokers.index(self)
-        if self_index + 1 < len(jokers):
-            self.copied_joker = jokers[self_index + 1]
-
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return self.copied_joker.get_card_retriggers(card, board)
     
     def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return self.copied_joker.get_hand_card_retriggers(card, board)
+
+
+class JokerBlueprint(JokerCopier):
+    def __init__(self):
+        super().__init__(name='Blueprint')
+
+    def change_evaluation_rules(self, board: BoardVision) -> None:
+        # get copied
+        self.copied_joker = Joker('dummy')
+        jokers = board.get_jokers()
+        self_index = jokers.index(self)
+        if self_index + 1 < len(jokers):
+            candidate = jokers[self_index + 1]
+            if isinstance(candidate, JokerCopier):
+                self.copied_joker = candidate.copied_joker
+            else:
+                self.copied_joker = candidate
+        
+        if self.copied_joker is self:
+            self.copied_joker = Joker('dummy')
+        print(f'{self.data.name} copying {self.copied_joker}')
+
+
+class JokerBrainstorm(JokerCopier):
+    def __init__(self):
+        super().__init__(name='Brainstorm')
+
+    def change_evaluation_rules(self, board: BoardVision) -> None:
+        # get copied
+        self.copied_joker = Joker('dummy')
+        candiadte = board.get_jokers()[0]
+        if isinstance(candiadte, JokerCopier):
+            self.copied_joker = candiadte.copied_joker
+        else:
+            self.copied_joker = candiadte
+        
+        if self.copied_joker is self:
+            self.copied_joker = Joker('dummy')
+        print(f'{self.data.name} copying {self.copied_joker}')

@@ -128,3 +128,4 @@ class BoardData:
     remaining_discards: int = 3
     money: int = 10
     joker_spaces = 5
+    starting_deck_size: int = 52

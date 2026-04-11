@@ -181,17 +181,3 @@ def asses_poker_hand(cards: list[Card], evaluation_rules: EvaluationRules) -> tu
     evaluator = HandEvaluator(cards, evaluation_rules)
     return evaluator.get_evaluation()
 
-
-if __name__ == '__main__':
-    h = HandEvaluator(
-        [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN, enhancement=Enhancement.WILD)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.EIGHT)),
-        ],
-        EvaluationRules(reds_same_suit=True)
-    )
-
-    

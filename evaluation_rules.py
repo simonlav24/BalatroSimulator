@@ -11,7 +11,7 @@ class EvaluationRules:
     fingers: int = 5
     all_face: bool = False
     play_all_cards: bool = False
-    reds_same_suit: bool = False
+    smeared: bool = False
 
     def is_face_card(self, card: Card) -> bool:
         if self.all_face:
@@ -20,8 +20,10 @@ class EvaluationRules:
 
     def get_suit(self, card: Card) -> Suit:
         suit = card.get_suit()
-        if self.reds_same_suit and suit == Suit.DIAMONDS:
+        if self.smeared and suit == Suit.DIAMONDS:
             return Suit.HEARTS
+        if self.smeared and suit == Suit.CLUBS:
+            return Suit.SPADES
         return suit
 
     def is_suit(self, card: Card, suit: Suit) -> Suit:
@@ -30,6 +32,8 @@ class EvaluationRules:
             return False
         if suit == Suit.ANY or card_suit == Suit.ANY:
             return True
-        if self.reds_same_suit and all(s in [Suit.DIAMONDS, Suit.HEARTS] for s in [suit, card_suit]):
+        if self.smeared and all(s in [Suit.DIAMONDS, Suit.HEARTS] for s in [suit, card_suit]):
+            return True
+        if self.smeared and all(s in [Suit.CLUBS, Suit.SPADES] for s in [suit, card_suit]):
             return True
         return card_suit == suit
