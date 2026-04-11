@@ -250,6 +250,20 @@ class TestSimple(unittest.TestCase):
         self.assertEqual(hand_type, HandType.HIGH_CARD)
         self.assertEqual(played_cards, [cards[2]])
 
+    def test_all_stones(self):
+        cards = [
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.KING, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.FIVE, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN, enhancement=Enhancement.STONE)),
+            ]
+        evaluation_rules = EvaluationRules()
+        hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
+
+        self.assertEqual(hand_type, HandType.HIGH_CARD)
+        self.assertEqual(played_cards, [])
+
 
 if __name__ == '__main__':
     unittest.main()

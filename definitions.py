@@ -92,9 +92,10 @@ class HandType(Enum):
     FLUSH_FIVE = 'Flush Five'
 
 
-class ClacMode(Enum):
+class CalcMode(Enum):
     BEST = 'Best'
     WORST = 'Worst'
+    SIMULATE = 'Simulate'
 
 
 level_dict = {
@@ -126,3 +127,4 @@ class BoardData:
     discards: int = 3
     remaining_discards: int = 3
     money: int = 10
+    joker_spaces = 5

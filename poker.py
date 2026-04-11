@@ -12,9 +12,9 @@ class HandEvaluator:
         self.cards = [card for card in cards if card.get_rank() != Rank.NONE]
         self.eval = evaluation_rules
 
-        self.ranks = sorted((card.get_rank().value for card in cards))
-        self.suits = {self.eval.get_suit(card): 0 for card in cards if self.eval.get_suit(card) != Suit.ANY}
-        for card in cards:
+        self.ranks = sorted((card.get_rank().value for card in self.cards))
+        self.suits = {self.eval.get_suit(card): 0 for card in self.cards if self.eval.get_suit(card) != Suit.ANY}
+        for card in self.cards:
             if self.eval.get_suit(card) == Suit.ANY:
                 for key in self.suits.keys():
                     self.suits[key] += 1
@@ -147,11 +147,13 @@ class HandEvaluator:
         return None
     
     def check_high_card(self) -> list[Card] | None:
+        if len(self.cards) == 0:
+            return []
         max_rank = self.ranks[-1]
         for card in self.cards:
             if card.get_rank().value == max_rank:
                 return [card]
-        return None
+        return []
 
     def get_evaluation(self) -> tuple[HandType, list[Card]]:
         checks = [
@@ -172,7 +174,7 @@ class HandEvaluator:
             played_cards = check()
             if played_cards != None:
                 return hand_type, played_cards
-        return None, None
+        return HandType.HIGH_CARD, []
 
 
 def asses_poker_hand(cards: list[Card], evaluation_rules: EvaluationRules) -> tuple[HandType, list[Card]]:

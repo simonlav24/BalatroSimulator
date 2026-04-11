@@ -1,6 +1,7 @@
 
 from dataclasses import dataclass
 from typing import Protocol
+from random import randint
 
 from definitions import *
 
@@ -20,7 +21,7 @@ class BoardVision(Protocol):
     def add_mult(self, mult: float): ...
     def add_chips(self, chips: int): ...
     def add_time_mult(self, mult: float): ...
-    def get_mode(self) -> ClacMode: ...
+    def get_mode(self) -> CalcMode: ...
 
 
 class Card:
@@ -79,9 +80,12 @@ class Card:
 
         elif self.data.enhancement == Enhancement.LUCKY:
             board.add_chips(self.get_value())
-            if board.get_mode() == ClacMode.BEST:
+            if board.get_mode() == CalcMode.BEST:
                 board.add_mult(20)
-        
+            if board.get_mode() == CalcMode.SIMULATE:
+                if randint(1, 5) == 1:
+                    board.add_mult(20)
+
         else:
             board.add_chips(self.get_value())
         
@@ -93,4 +97,8 @@ class Card:
             board.add_mult(10)
         
         elif self.data.edition == Edition.POLYCHROME:
+            board.add_time_mult(1.5)
+
+    def trigger_in_hand_on_hand_end(self, board: BoardVision) -> None:
+        if self.data.enhancement == Enhancement.STEEL:
             board.add_time_mult(1.5)
