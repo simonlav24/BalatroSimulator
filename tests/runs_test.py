@@ -146,3 +146,71 @@ class TestRuns(unittest.TestCase):
         board.jokers.append(JokerSockAndBuskin())
         self.assertEqual(board.play()['score'], 5940)
 
+    def test_flower_pot(self):
+        board = Board()
+        board.hand_cards = []
+        board.selected_cards = [
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.SPADES, rank=Rank.JACK)),
+            ]
+        board.jokers = [
+            JokerFlowerPot(),
+        ]
+        self.assertEqual(board.play()['score'], 3150)
+
+        board.selected_cards = [
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.SPADES, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            ]
+        self.assertEqual(board.play()['score'], 3150)
+
+        board.selected_cards = [
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            ]
+        self.assertEqual(board.play()['score'], 3150)
+
+        board.selected_cards = [
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD)),
+            Card(CardData(suit=Suit.SPADES, rank=Rank.JACK)),
+            ]
+        self.assertEqual(board.play()['score'], 3150)
+
+        board.jokers.append(JokerSmearedJoker())
+        board.selected_cards = [
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.JACK)),
+            ]
+        self.assertEqual(board.play()['score'], 3150)
+    
+    def test_wee_joker(self):
+        board = Board()
+        board.hand_cards = []
+        board.selected_cards = [
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.TWO, seal=Seal.RED, edition=Edition.POLYCHROME)),
+            Card(CardData(suit=Suit.HEARTS, rank=Rank.TWO, seal=Seal.RED, edition=Edition.POLYCHROME)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.TWO, enhancement=Enhancement.MULT)),
+            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.TWO, enhancement=Enhancement.MULT)),
+            Card(CardData(suit=Suit.CLUBS, rank=Rank.TWO)),
+            ]
+        board.jokers = [
+            JokerWeeJoker(),
+            JokerHangingChad(),
+            JokerHack()
+        ]
+        self.assertEqual(board.play()['score'], 84122)

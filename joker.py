@@ -1,6 +1,7 @@
 
 from typing import Protocol
 from dataclasses import dataclass
+from math import floor
 
 from definitions import *
 from card import Card
@@ -11,6 +12,7 @@ from evaluation_rules import EvaluationRules
 class JokerData:
     name: str
     cost: int = 0
+    extra_value: int = 0
     edition: Edition = Edition.BASE
 
 
@@ -83,5 +85,11 @@ class Joker:
     def on_added_card(self, board: BoardVision) -> None:
         ...
     
-    def on_blind_selected(self, Board: BoardVision) -> None:
+    def on_blind_selected(self, board: BoardVision) -> None:
         ...
+    
+    def get_sell_value(self, board: BoardVision) -> int:
+        buy_cost = floor((self.data.cost + edition_cost[self.data.edition]) * board.get_data().discount_percent)
+        sell_cost = floor(buy_cost / 2)
+        return sell_cost
+    

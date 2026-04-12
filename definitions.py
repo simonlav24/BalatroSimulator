@@ -10,6 +10,17 @@ class Suit(Enum):
     ANY = 'Any'
     NONE = 'None'
 
+def get_similar(suit: Suit) -> 'Suit':
+    if suit == Suit.HEARTS:
+        return Suit.DIAMONDS
+    elif suit == Suit.DIAMONDS:
+        return Suit.HEARTS
+    elif suit == Suit.CLUBS:
+        return Suit.SPADES
+    else:
+        return Suit.CLUBS
+
+
 class Rank(Enum):
     NONE = 0
     TWO = 2
@@ -119,6 +130,7 @@ def get_hand_level_chips_mult(hand_type: HandType, level: int) -> tuple[int, int
     mult = level_dict[hand_type][1] + (level - 1) * level_dict[hand_type][3]
     return chips, mult
 
+
 @dataclass
 class BoardData:
     hand_size: int = 8
@@ -129,3 +141,14 @@ class BoardData:
     money: int = 10
     joker_spaces = 5
     starting_deck_size: int = 52
+    discount_percent: float = 0.0
+    skipped_blinds: int = 0
+
+
+edition_cost = {
+    Edition.BASE: 0,
+    Edition.FOIL: 2,
+    Edition.HOLOGRAPHIC: 3,
+    Edition.POLYCHROME: 5,
+    Edition.NEGATIVE: 5,
+}
