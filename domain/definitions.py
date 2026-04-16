@@ -125,7 +125,7 @@ level_dict = {
 }
 
 
-def get_hand_level_chips_mult(hand_type: HandType, level: int) -> tuple[int, int]:
+def get_hand_level_chips_mult(hand_type: HandType, level: int=1) -> tuple[int, int]:
     chips = level_dict[hand_type][0] + (level - 1) * level_dict[hand_type][2]
     mult = level_dict[hand_type][1] + (level - 1) * level_dict[hand_type][3]
     return chips, mult

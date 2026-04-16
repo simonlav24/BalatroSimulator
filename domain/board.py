@@ -37,10 +37,11 @@ class Board:
 
         self.levels[self.current_hand_type]['played'] += 1
 
-        if self.evaluation_rules.play_all_cards:
-            self.played_cards = self.selected_cards
         # add stone cards
         self.played_cards += [card for card in self.selected_cards if card not in self.played_cards and card.data.enhancement == Enhancement.STONE]
+        
+        if self.evaluation_rules.play_all_cards:
+            self.played_cards = self.selected_cards
 
         # start from hand type base level
         chips, mult = get_hand_level_chips_mult(self.current_hand_type, self.levels[self.current_hand_type]['level'])

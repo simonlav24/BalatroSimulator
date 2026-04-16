@@ -5,8 +5,8 @@ from domain.definitions import Edition
 @dataclass
 class TriggerCard:
     id: int
-    mult: float = 0
     chips: float = 0
+    mult: float = 0
     time_mult: float = 0
 
 @dataclass

@@ -34,7 +34,7 @@ class JokerGreedy(Joker):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
             self.event_bus.add_event(TriggerCard(self.id, mult=3))
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerLusty(Joker):
@@ -47,7 +47,7 @@ class JokerLusty(Joker):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
             self.event_bus.add_event(TriggerCard(self.id, mult=3))
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerWrathful(Joker):
@@ -60,7 +60,7 @@ class JokerWrathful(Joker):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
             self.event_bus.add_event(TriggerCard(self.id, mult=3))
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerGluttonous(Joker):
@@ -73,7 +73,7 @@ class JokerGluttonous(Joker):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
             self.event_bus.add_event(TriggerCard(self.id, mult=3))
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerJollyJoker(Joker):
@@ -364,6 +364,7 @@ class JokerRaisedFist(Joker):
         cards.sort(key=lambda x: x.get_rank().value)
         mult = 2 * base_value_map[cards[0].get_rank()]
         board.add_mult(mult)
+        self.event_bus.add_event(TriggerCard(self.id, mult=mult))
         logger.info(f'{self.data.name} added {mult} mult')
         super().trigger_on_end_hand(board)
 
@@ -384,7 +385,7 @@ class JokerFibonacci(Joker):
         if card.get_rank() in [Rank.TWO, Rank.THREE, Rank.FIVE, Rank.EIGHT, Rank.ACE]:
             board.add_mult(8)
             logger.info(f'{self.data.name} added 8 mult')
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerSteelJoker(Joker):
@@ -471,7 +472,7 @@ class JokerEvenSteven(Joker):
         if card.get_rank() in [Rank.TWO, Rank.FOUR, Rank.SIX, Rank.EIGHT, Rank.TEN]:
             board.add_mult(4)
             logger.info(f'{self.data.name} added 4 mult')
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerOddTodd(Joker):
@@ -483,7 +484,7 @@ class JokerOddTodd(Joker):
         if card.get_rank() in [Rank.ACE, Rank.THREE, Rank.FIVE, Rank.SEVEN, Rank.NINE]:
             board.add_chips(31)
             logger.info(f'{self.data.name} added 31 chips')
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerScholar(Joker):
@@ -496,7 +497,7 @@ class JokerScholar(Joker):
             board.add_chips(20)
             board.add_mult(4)
             logger.info(f'{self.data.name} added 20 chips, 4 mult')
-        super().trigger_on_play_card(board)
+        super().trigger_on_play_card(card, board)
 
 
 class JokerBusinessCard(Joker):
