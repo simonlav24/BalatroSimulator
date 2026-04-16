@@ -3,75 +3,82 @@
 import logging
 from random import randint, choice
 
-from joker import Joker, BoardVision
-from card import Card
-from definitions import *
-from poker import HandEvaluator
+from domain.joker import Joker, BoardVision, JokerCopier
+from domain.card import Card
+from domain.definitions import *
+from domain.poker import HandEvaluator
+
+from core.event_bus import EventBus, TriggerCard
 
 logger = logging.getLogger(__name__)
 
 class JokerJimbo(Joker):
-    def __init__(self):
-        super().__init__(name='Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Joker', event_bus=event_bus)
         self.data.cost = 2
 
     def trigger_on_end_hand(self, board: BoardVision):
         board.add_mult(4)
         logger.info(f'{self.data.name} added 4 mult')
+        self.event_bus.add_event(TriggerCard(self.id, mult=4))
         super().trigger_on_end_hand(board)
 
 
 class JokerGreedy(Joker):
-    def __init__(self):
-        super().__init__(name='Greedy Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Greedy Joker', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.DIAMONDS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
+            self.event_bus.add_event(TriggerCard(self.id, mult=3))
         super().trigger_on_play_card(board)
 
 
 class JokerLusty(Joker):
-    def __init__(self):
-        super().__init__(name='Lusty Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Lusty Joker', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.HEARTS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
+            self.event_bus.add_event(TriggerCard(self.id, mult=3))
         super().trigger_on_play_card(board)
 
 
 class JokerWrathful(Joker):
-    def __init__(self):
-        super().__init__(name='Wrathful Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Wrathful Joker', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.SPADES):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
+            self.event_bus.add_event(TriggerCard(self.id, mult=3))
         super().trigger_on_play_card(board)
 
 
 class JokerGluttonous(Joker):
-    def __init__(self):
-        super().__init__(name='Gluttonous Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Gluttonous Joker', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.CLUBS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
+            self.event_bus.add_event(TriggerCard(self.id, mult=3))
         super().trigger_on_play_card(board)
 
 
 class JokerJollyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Jolly Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Jolly Joker', event_bus=event_bus)
         self.data.cost = 3
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -79,12 +86,13 @@ class JokerJollyJoker(Joker):
         if evaluator.check_pair() is not None:
             board.add_mult(8)
             logger.info(f'{self.data.name} added 8 mult')
+            self.event_bus.add_event(TriggerCard(self.id, mult=8))
         super().trigger_on_end_hand(board)
 
 
 class JokerZanyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Zany Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Zany Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -96,8 +104,8 @@ class JokerZanyJoker(Joker):
 
 
 class JokerMadJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Mad Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Mad Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -109,8 +117,8 @@ class JokerMadJoker(Joker):
 
 
 class JokerCrazyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Crazy Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Crazy Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -122,8 +130,8 @@ class JokerCrazyJoker(Joker):
 
 
 class JokerDrollJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Droll Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Droll Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -135,8 +143,8 @@ class JokerDrollJoker(Joker):
 
 
 class JokerSlyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Sly Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Sly Joker', event_bus=event_bus)
         self.data.cost = 3
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -148,8 +156,8 @@ class JokerSlyJoker(Joker):
     
 
 class JokerWilyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Wily Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Wily Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -161,8 +169,8 @@ class JokerWilyJoker(Joker):
 
 
 class JokerCleverJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Clever Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Clever Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -174,8 +182,8 @@ class JokerCleverJoker(Joker):
 
 
 class JokerDeviousJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Devious Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Devious Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -187,8 +195,8 @@ class JokerDeviousJoker(Joker):
 
 
 class JokerCraftyJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Crafty Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Crafty Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -200,8 +208,8 @@ class JokerCraftyJoker(Joker):
 
 
 class JokerHalfJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Half Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Half Joker', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -212,8 +220,8 @@ class JokerHalfJoker(Joker):
 
 
 class JokerStencil(Joker):
-    def __init__(self):
-        super().__init__(name='Joker Stencil')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Joker Stencil', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.UNCOMMON
 
@@ -226,8 +234,8 @@ class JokerStencil(Joker):
 
 
 class JokerFourFingers(Joker):
-    def __init__(self):
-        super().__init__(name='Four Fingers')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Four Fingers', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -236,8 +244,8 @@ class JokerFourFingers(Joker):
 
 # todo:
 class JokerMime(Joker):
-    def __init__(self):
-        super().__init__(name='Mime')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Mime', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
     
@@ -246,14 +254,14 @@ class JokerMime(Joker):
 
 
 class JokerCreditCard(Joker):
-    def __init__(self):
-        super().__init__(name='Credit Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Credit Card', event_bus=event_bus)
         self.data.cost = 1
 
 
 class JokerCeremonialDagger(Joker):
-    def __init__(self):
-        super().__init__(name='Ceremonial Dagger')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Ceremonial Dagger', event_bus=event_bus)
         self.data.cost = 6
         self.mult = 0
 
@@ -264,8 +272,8 @@ class JokerCeremonialDagger(Joker):
 
 
 class JokerBanner(Joker):
-    def __init__(self):
-        super().__init__(name='Banner')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Banner', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -276,8 +284,8 @@ class JokerBanner(Joker):
 
 
 class JokerMysticSummit(Joker):
-    def __init__(self):
-        super().__init__(name='Mystic Summit')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Mystic Summit', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -288,15 +296,15 @@ class JokerMysticSummit(Joker):
 
 
 class JokerMarbleJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Marble Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Marble Joker', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerLoyaltyCard(Joker):
-    def __init__(self):
-        super().__init__(name='Loyalty Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Loyalty Card', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
         self.count = 1
@@ -311,14 +319,14 @@ class JokerLoyaltyCard(Joker):
 
 
 class Joker8Ball(Joker):
-    def __init__(self):
-        super().__init__(name='8 Ball')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='8 Ball', event_bus=event_bus)
         self.data.cost = 5
 
 
 class JokerMisprint(Joker):
-    def __init__(self):
-        super().__init__(name='Misprint')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Misprint', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -335,8 +343,8 @@ class JokerMisprint(Joker):
 
 
 class JokerDusk(Joker):
-    def __init__(self):
-        super().__init__(name='Dusk')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Dusk', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -347,8 +355,8 @@ class JokerDusk(Joker):
 
 
 class JokerRaisedFist(Joker):
-    def __init__(self):
-        super().__init__(name='RaisedFist')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='RaisedFist', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -361,14 +369,14 @@ class JokerRaisedFist(Joker):
 
 
 class JokerChaosTheClown(Joker):
-    def __init__(self):
-        super().__init__(name='Chaos the Clown')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Chaos the Clown', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerFibonacci(Joker):
-    def __init__(self):
-        super().__init__(name='Fibonacci')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Fibonacci', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.UNCOMMON
 
@@ -380,21 +388,21 @@ class JokerFibonacci(Joker):
 
 
 class JokerSteelJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Steel Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Steel Joker', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
     def trigger_on_end_hand(self, board: BoardVision):
-        mult = 0.2 * sum([card for card in board.get_full_deck() if card.data.enhancement == Enhancement.STEEL])
+        mult = 1.0 + 0.2 * sum([card for card in board.get_full_deck() if card.data.enhancement == Enhancement.STEEL])
         board.add_time_mult(mult)
         logger.info(f'{self.data.name} added {mult} time-mult')
         super().trigger_on_end_hand(board)
 
 
 class JokerScaryFace(Joker):
-    def __init__(self):
-        super().__init__(name='Scary Face')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Scary Face', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
@@ -404,8 +412,8 @@ class JokerScaryFace(Joker):
 
 
 class JokerAbstractJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Abstract Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Abstract Joker', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision):
@@ -416,14 +424,14 @@ class JokerAbstractJoker(Joker):
 
 
 class JokerDelayedGratification(Joker):
-    def __init__(self):
-        super().__init__(name='Delayed Gratification')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Delayed Gratification', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerHack(Joker):
-    def __init__(self):
-        super().__init__(name='Hack')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hack', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -434,8 +442,8 @@ class JokerHack(Joker):
 
 
 class JokerPareidolia(Joker):
-    def __init__(self):
-        super().__init__(name='Pareidolia')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Pareidolia', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
@@ -444,8 +452,8 @@ class JokerPareidolia(Joker):
 
 
 class JokerGrosMichel(Joker):
-    def __init__(self):
-        super().__init__(name='Gros Michel')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Gros Michel', event_bus=event_bus)
         self.data.cost = 5
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -455,8 +463,8 @@ class JokerGrosMichel(Joker):
 
 
 class JokerEvenSteven(Joker):
-    def __init__(self):
-        super().__init__(name='Even Steven')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Even Steven', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
@@ -467,8 +475,8 @@ class JokerEvenSteven(Joker):
 
 
 class JokerOddTodd(Joker):
-    def __init__(self):
-        super().__init__(name='Odd Todd')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Odd Todd', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
@@ -479,8 +487,8 @@ class JokerOddTodd(Joker):
 
 
 class JokerScholar(Joker):
-    def __init__(self):
-        super().__init__(name='Scholar')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Scholar', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
@@ -492,14 +500,14 @@ class JokerScholar(Joker):
 
 
 class JokerBusinessCard(Joker):
-    def __init__(self):
-        super().__init__(name='Business Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Business Card', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerSupernova(Joker):
-    def __init__(self):
-        super().__init__(name='Supernova')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Supernova', event_bus=event_bus)
         self.data.cost = 5
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -511,8 +519,8 @@ class JokerSupernova(Joker):
 
 
 class JokerRideTheBus(Joker):
-    def __init__(self):
-        super().__init__(name='Ride the Bus')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Ride the Bus', event_bus=event_bus)
         self.data.cost = 6
         self.mult = 0
     
@@ -535,22 +543,22 @@ class JokerRideTheBus(Joker):
 
 
 class JokerSpaceJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Space Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Space Joker', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerEgg(Joker):
-    def __init__(self):
-        super().__init__(name='Space Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Space Joker', event_bus=event_bus)
         self.data.cost = 4
         self.sell_addition = 0
 
 
 class JokerBurglar(Joker):
-    def __init__(self):
-        super().__init__(name='Burglar')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Burglar', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -562,8 +570,8 @@ class JokerBurglar(Joker):
 
 
 class JokerBlackboard(Joker):
-    def __init__(self):
-        super().__init__(name='Blackboard')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Blackboard', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -575,8 +583,8 @@ class JokerBlackboard(Joker):
 
 
 class JokerRunner(Joker):
-    def __init__(self):
-        super().__init__(name='Runner')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Runner', event_bus=event_bus)
         self.data.cost = 5
         self.chips = 0
 
@@ -593,8 +601,8 @@ class JokerRunner(Joker):
 
 
 class JokerIceCream(Joker):
-    def __init__(self):
-        super().__init__(name='Ice Cream')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Ice Cream', event_bus=event_bus)
         self.data.cost = 5
         self.chips = 100
     
@@ -607,15 +615,15 @@ class JokerIceCream(Joker):
 
 
 class JokerDNA(Joker):
-    def __init__(self):
-        super().__init__(name='DNA')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='DNA', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
 
 
 class JokerSplash(Joker):
-    def __init__(self):
-        super().__init__(name='Splash')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Splash', event_bus=event_bus)
         self.data.cost = 3
     
     def change_evaluation_rules(self, board: BoardVision) -> None:
@@ -623,8 +631,8 @@ class JokerSplash(Joker):
     
 
 class JokerBlueJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Blue Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Blue Joker', event_bus=event_bus)
         self.data.cost = 5
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -636,15 +644,15 @@ class JokerBlueJoker(Joker):
 
 
 class JokerSixthSense(Joker):
-    def __init__(self):
-        super().__init__(name='Sixth Sense')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Sixth Sense', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerConstellation(Joker):
-    def __init__(self):
-        super().__init__(name='Constellation')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Constellation', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.mult_tens = 0
@@ -657,8 +665,8 @@ class JokerConstellation(Joker):
 
 
 class JokerHiker(Joker):
-    def __init__(self):
-        super().__init__(name='Hiker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hiker', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
     
@@ -669,14 +677,14 @@ class JokerHiker(Joker):
 
 
 class JokerFacelessJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Faceless Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Faceless Joker', event_bus=event_bus)
         self.data.cost = 4
     
 
 class JokerGreenJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Green Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Green Joker', event_bus=event_bus)
         self.data.cost = 4
         self.mult = 0
     
@@ -692,20 +700,20 @@ class JokerGreenJoker(Joker):
 
 
 class JokerSuperposition(Joker):
-    def __init__(self):
-        super().__init__(name='Superposition')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Superposition', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerToDoList(Joker):
-    def __init__(self):
-        super().__init__(name='To Do List')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='To Do List', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerCavendish(Joker):
-    def __init__(self):
-        super().__init__(name='Cavendish')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Cavendish', event_bus=event_bus)
         self.data.cost = 4
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -715,8 +723,8 @@ class JokerCavendish(Joker):
 
 
 class JokerCardSharp(Joker):
-    def __init__(self):
-        super().__init__(name='Card Sharp')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Card Sharp', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.played_hands: set[HandType] = set()
@@ -730,8 +738,8 @@ class JokerCardSharp(Joker):
 
 
 class JokerRedCard(Joker):
-    def __init__(self):
-        super().__init__(name='Red Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Red Card', event_bus=event_bus)
         self.data.cost = 5
         self.mult = 0
     
@@ -743,8 +751,8 @@ class JokerRedCard(Joker):
 
 
 class JokerMadness(Joker):
-    def __init__(self):
-        super().__init__(name='Madness')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Madness', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
         self.mult = 0
@@ -757,8 +765,8 @@ class JokerMadness(Joker):
 
 
 class JokerSquareJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Square Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Square Joker', event_bus=event_bus)
         self.data.cost = 4
         self.chips = 0
     
@@ -775,21 +783,21 @@ class JokerSquareJoker(Joker):
 
 
 class JokerSeance(Joker):
-    def __init__(self):
-        super().__init__(name='Seance')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Seance', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerRiffRaff(Joker):
-    def __init__(self):
-        super().__init__(name='Riff-Raff')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Riff-Raff', event_bus=event_bus)
         self.data.cost = 6
 
 
 class JokerVampire(Joker):
-    def __init__(self):
-        super().__init__(name='Vampire')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Vampire', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
         self.enhancements = 0
@@ -810,8 +818,8 @@ class JokerVampire(Joker):
 
 
 class JokerShortcut(Joker):
-    def __init__(self):
-        super().__init__(name='Shortcut')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Shortcut', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -820,8 +828,8 @@ class JokerShortcut(Joker):
 
 
 class JokerHologram(Joker):
-    def __init__(self):
-        super().__init__(name='Hologram')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hologram', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
         self.added_cards = 0
@@ -834,15 +842,15 @@ class JokerHologram(Joker):
 
 
 class JokerVagabond(Joker):
-    def __init__(self):
-        super().__init__(name='Vagabond')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Vagabond', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
 
 
 class JokerBaron(Joker):
-    def __init__(self):
-        super().__init__(name='Baron')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Baron', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -854,22 +862,22 @@ class JokerBaron(Joker):
 
 
 class JokerCloud9(Joker):
-    def __init__(self):
-        super().__init__(name='Cloud 9')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Cloud 9', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerRocket(Joker):
-    def __init__(self):
-        super().__init__(name='Rocket')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Rocket', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerObelisk(Joker):
-    def __init__(self):
-        super().__init__(name='Obelisk')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Obelisk', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
         self.consecutive_played = 0
@@ -882,8 +890,8 @@ class JokerObelisk(Joker):
 
 
 class JokerMidasMask(Joker):
-    def __init__(self):
-        super().__init__(name='Midas Mask')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Midas Mask', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
     
@@ -895,15 +903,15 @@ class JokerMidasMask(Joker):
         
 
 class JokerLuchador(Joker):
-    def __init__(self):
-        super().__init__(name='Luchador')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Luchador', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerPhotograph(Joker):
-    def __init__(self):
-        super().__init__(name='Photograph')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Photograph', event_bus=event_bus)
         self.data.cost = 5
     
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
@@ -916,22 +924,22 @@ class JokerPhotograph(Joker):
 
 
 class JokerGiftCard(Joker):
-    def __init__(self):
-        super().__init__(name='Gift Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Gift Card', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         
 
 class JokerTurtleBean(Joker):
-    def __init__(self):
-        super().__init__(name='Turtle Bean')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Turtle Bean', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerErosion(Joker):
-    def __init__(self):
-        super().__init__(name='Erosion')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Erosion', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -946,33 +954,33 @@ class JokerErosion(Joker):
 
 
 class JokerReservedParking(Joker):
-    def __init__(self):
-        super().__init__(name='Reserved Parking')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Reserved Parking', event_bus=event_bus)
         self.data.cost = 6
 
 
 class JokerMailInRebate(Joker):
-    def __init__(self):
-        super().__init__(name='Mail-In Rebate')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Mail-In Rebate', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerTotheMoon(Joker):
-    def __init__(self):
-        super().__init__(name='To the Moon')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='To the Moon', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerHallucination(Joker):
-    def __init__(self):
-        super().__init__(name='Hallucination')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hallucination', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerFortuneTeller(Joker):
-    def __init__(self):
-        super().__init__(name='Fortune Teller')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Fortune Teller', event_bus=event_bus)
         self.data.cost = 6
         self.mult = 0
     
@@ -984,20 +992,20 @@ class JokerFortuneTeller(Joker):
 
 
 class JokerJuggler(Joker):
-    def __init__(self):
-        super().__init__(name='Juggler')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Juggler', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerDrunkard(Joker):
-    def __init__(self):
-        super().__init__(name='Drunkard')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Drunkard', event_bus=event_bus)
         self.data.cost = 4
 
 
 class JokerStoneJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Stone Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Stone Joker', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -1010,14 +1018,14 @@ class JokerStoneJoker(Joker):
 
 
 class JokerGoldenJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Golden Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Golden Joker', event_bus=event_bus)
         self.data.cost = 6
 
 
 class JokerLuckyCat(Joker):
-    def __init__(self):
-        super().__init__(name='Lucky Cat')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Lucky Cat', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.lucky_hits = 0
@@ -1030,8 +1038,8 @@ class JokerLuckyCat(Joker):
 
 
 class JokerBaseballCard(Joker):
-    def __init__(self):
-        super().__init__(name='Baseball Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Baseball Card', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1044,8 +1052,8 @@ class JokerBaseballCard(Joker):
 
 
 class JokerBull(Joker):
-    def __init__(self):
-        super().__init__(name='Bull')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Bull', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -1058,22 +1066,22 @@ class JokerBull(Joker):
 
 
 class JokerDietCola(Joker):
-    def __init__(self):
-        super().__init__(name='Diet Cola')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Diet Cola', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerTradingCard(Joker):
-    def __init__(self):
-        super().__init__(name='Trading Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Trading Card', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerFlashCard(Joker):
-    def __init__(self):
-        super().__init__(name='Flash Card')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Flash Card', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
         self.mult = 0
@@ -1086,8 +1094,8 @@ class JokerFlashCard(Joker):
 
 
 class JokerPopcorn(Joker):
-    def __init__(self):
-        super().__init__(name='Popcorn')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Popcorn', event_bus=event_bus)
         self.data.cost = 5
         self.mult = 20
 
@@ -1102,8 +1110,8 @@ class JokerPopcorn(Joker):
 
 
 class SpareTrousers(Joker):
-    def __init__(self):
-        super().__init__(name='Spare Trousers')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Spare Trousers', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.mult = 0
@@ -1121,8 +1129,8 @@ class SpareTrousers(Joker):
 
 
 class JokerAncientJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Ancient Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Ancient Joker', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
         self.suit = Suit.HEARTS
@@ -1138,8 +1146,8 @@ class JokerAncientJoker(Joker):
 
 
 class JokerRamen(Joker):
-    def __init__(self):
-        super().__init__(name='Ramen')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Ramen', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.remaining_discards = 200
@@ -1158,8 +1166,8 @@ class JokerRamen(Joker):
 
 
 class JokerWalkieTalkie(Joker):
-    def __init__(self):
-        super().__init__(name='Walkie Talkie')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Walkie Talkie', event_bus=event_bus)
         self.data.cost = 4
     
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
@@ -1171,8 +1179,8 @@ class JokerWalkieTalkie(Joker):
 
 
 class JokerSeltzer(Joker):
-    def __init__(self):
-        super().__init__(name='Seltzer')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Seltzer', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -1181,8 +1189,8 @@ class JokerSeltzer(Joker):
 
 
 class JokerCastle(Joker):
-    def __init__(self):
-        super().__init__(name='Castle')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Castle', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.chips = 0
@@ -1203,8 +1211,8 @@ class JokerCastle(Joker):
 
 
 class JokerSmileyFace(Joker):
-    def __init__(self):
-        super().__init__(name='Smiley Face')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Smiley Face', event_bus=event_bus)
         self.data.cost = 4
     
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
@@ -1215,8 +1223,8 @@ class JokerSmileyFace(Joker):
 
 
 class JokerCampfire(Joker):
-    def __init__(self):
-        super().__init__(name='Campfire')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Campfire', event_bus=event_bus)
         self.data.cost = 9
         self.rarity = Rarity.RARE
         self.solds = 0
@@ -1229,8 +1237,8 @@ class JokerCampfire(Joker):
 
 
 class JokerGoldenTicket(Joker):
-    def __init__(self):
-        super().__init__(name='Golden Ticket')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Golden Ticket', event_bus=event_bus)
         self.data.cost = 5
     
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
@@ -1241,15 +1249,15 @@ class JokerGoldenTicket(Joker):
 
 
 class JokerMrBones(Joker):
-    def __init__(self):
-        super().__init__(name='Mr. Bones')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Mr. Bones', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerAcrobat(Joker):
-    def __init__(self):
-        super().__init__(name='Acrobat')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Acrobat', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -1261,8 +1269,8 @@ class JokerAcrobat(Joker):
 
 
 class JokerSockAndBuskin(Joker):
-    def __init__(self):
-        super().__init__(name='Sock and Buskin')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Sock and Buskin', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
@@ -1273,8 +1281,8 @@ class JokerSockAndBuskin(Joker):
 
 
 class JokerSwashbuckler(Joker):
-    def __init__(self):
-        super().__init__(name='Swashbuckler')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Swashbuckler', event_bus=event_bus)
         self.data.cost = 4
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -1285,22 +1293,22 @@ class JokerSwashbuckler(Joker):
 
 
 class JokerTroubadour(Joker):
-    def __init__(self):
-        super().__init__(name='Troubadour')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Troubadour', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerCertificate(Joker):
-    def __init__(self):
-        super().__init__(name='Certificate')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Certificate', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerSmearedJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Smeared Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Smeared Joker', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
     
@@ -1309,8 +1317,8 @@ class JokerSmearedJoker(Joker):
 
 
 class JokerThrowback(Joker):
-    def __init__(self):
-        super().__init__(name='Throwback')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Throwback', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -1322,8 +1330,8 @@ class JokerThrowback(Joker):
 
 
 class JokerHangingChad(Joker):
-    def __init__(self):
-        super().__init__(name='Hanging Chad')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hanging Chad', event_bus=event_bus)
         self.data.cost = 4
 
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
@@ -1333,8 +1341,8 @@ class JokerHangingChad(Joker):
 
 
 class JokerRoughGem(Joker):
-    def __init__(self):
-        super().__init__(name='Rough Gem')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Rough Gem', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -1346,8 +1354,8 @@ class JokerRoughGem(Joker):
 
 
 class JokerBloodstone(Joker):
-    def __init__(self):
-        super().__init__(name='Bloodstone')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Bloodstone', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -1365,8 +1373,8 @@ class JokerBloodstone(Joker):
 
 
 class JokerArrowhead(Joker):
-    def __init__(self):
-        super().__init__(name='Arrowhead')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Arrowhead', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -1378,8 +1386,8 @@ class JokerArrowhead(Joker):
 
 
 class JokerOnyxAgate(Joker):
-    def __init__(self):
-        super().__init__(name='Onyx Agate')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Onyx Agate', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -1391,8 +1399,8 @@ class JokerOnyxAgate(Joker):
 
 
 class JokerGlassJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Glass Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Glass Joker', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.glass_broken = 0
@@ -1405,15 +1413,15 @@ class JokerGlassJoker(Joker):
 
 
 class JokerShowman(Joker):
-    def __init__(self):
-        super().__init__(name='Showman')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Showman', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerFlowerPot(Joker):
-    def __init__(self):
-        super().__init__(name='FlowerPot')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='FlowerPot', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -1453,42 +1461,13 @@ class JokerFlowerPot(Joker):
         super().trigger_on_end_hand(board)
 
 
-class JokerCopier(Joker):
-    def __init__(self, name: str):
-        super().__init__(name=name)
-        self.data.cost = 10
-        self.rarity = Rarity.RARE
-        self.copied_joker: Joker = Joker('dummy')
-
-    def trigger_on_start_hand(self, board: BoardVision) -> None:
-        self.copied_joker.trigger_on_start_hand(board)
-
-    def trigger_on_end_hand(self, board: BoardVision) -> None:
-        self.copied_joker.trigger_on_end_hand(board)
-    
-    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
-        self.copied_joker.trigger_on_play_card(card, board)
-    
-    def trigger_on_card_in_hand(self, card: Card, board: BoardVision) -> None:
-        self.copied_joker.trigger_on_card_in_hand(card, board)
-    
-    def trigger_on_discard_cards(self, cards: list[Card], board: BoardVision) -> None:
-        self.copied_joker.trigger_on_discard_cards(cards, board)
-
-    def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
-        return self.copied_joker.get_card_retriggers(card, board)
-    
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
-        return self.copied_joker.get_hand_card_retriggers(card, board)
-
-
 class JokerBlueprint(JokerCopier):
-    def __init__(self):
-        super().__init__(name='Blueprint')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Blueprint', event_bus=event_bus)
 
     def change_evaluation_rules(self, board: BoardVision) -> None:
         # get copied
-        self.copied_joker = Joker('dummy')
+        self.copied_joker = Joker('dummy', event_bus=self.event_bus)
         jokers = board.get_jokers()
         self_index = jokers.index(self)
         if self_index + 1 < len(jokers):
@@ -1499,13 +1478,13 @@ class JokerBlueprint(JokerCopier):
                 self.copied_joker = candidate
         
         if self.copied_joker is self:
-            self.copied_joker = Joker('dummy')
+            self.copied_joker = Joker('dummy', event_bus=self.event_bus)
         print(f'{self.data.name} copying {self.copied_joker}')
 
 
 class JokerWeeJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Wee Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Wee Joker', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
         self.chips = 0
@@ -1523,22 +1502,22 @@ class JokerWeeJoker(Joker):
 
 
 class JokerMerryAndy(Joker):
-    def __init__(self):
-        super().__init__(name='Merry Andy')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Merry Andy', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerOopsAll6s(Joker):
-    def __init__(self):
-        super().__init__(name='Oops! All 6s')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Oops! All 6s', event_bus=event_bus)
         self.data.cost = 4
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerTheIdol(Joker):
-    def __init__(self):
-        super().__init__(name='The Idol')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Idol', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
         self.rank = Rank.KING
@@ -1552,8 +1531,8 @@ class JokerTheIdol(Joker):
 
 
 class JokerSeeingDouble(Joker):
-    def __init__(self):
-        super().__init__(name='Seeing Double')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Seeing Double', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
     
@@ -1568,15 +1547,15 @@ class JokerSeeingDouble(Joker):
 
 
 class JokerMatador(Joker):
-    def __init__(self):
-        super().__init__(name='Matador')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Matador', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerHitTheRoad(Joker):
-    def __init__(self):
-        super().__init__(name='Hit the Road')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Hit the Road', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
         self.jacks = 0
@@ -1598,8 +1577,8 @@ class JokerHitTheRoad(Joker):
     
 
 class JokerTheDuo(Joker):
-    def __init__(self):
-        super().__init__(name='The Duo')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Duo', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1612,8 +1591,8 @@ class JokerTheDuo(Joker):
 
 
 class JokerTheTrio(Joker):
-    def __init__(self):
-        super().__init__(name='The Trio')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Trio', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1626,8 +1605,8 @@ class JokerTheTrio(Joker):
 
 
 class JokerTheFamily(Joker):
-    def __init__(self):
-        super().__init__(name='The Family')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Family', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1640,8 +1619,8 @@ class JokerTheFamily(Joker):
 
 
 class JokerTheOrder(Joker):
-    def __init__(self):
-        super().__init__(name='The Order')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Order', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1654,8 +1633,8 @@ class JokerTheOrder(Joker):
 
 
 class JokerTheTribe(Joker):
-    def __init__(self):
-        super().__init__(name='The Tribe')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='The Tribe', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
     
@@ -1668,8 +1647,8 @@ class JokerTheTribe(Joker):
 
 
 class JokerStuntman(Joker):
-    def __init__(self):
-        super().__init__(name='Stuntman')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Stuntman', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.RARE
     
@@ -1680,19 +1659,19 @@ class JokerStuntman(Joker):
 
 
 class JokerInvisibleJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Invisible Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Invisible Joker', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
 
 
 class JokerBrainstorm(JokerCopier):
-    def __init__(self):
-        super().__init__(name='Brainstorm')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Brainstorm', event_bus=event_bus)
 
     def change_evaluation_rules(self, board: BoardVision) -> None:
         # get copied
-        self.copied_joker = Joker('dummy')
+        self.copied_joker = Joker('dummy', event_bus=self.event_bus)
         candiadte = board.get_jokers()[0]
         if isinstance(candiadte, JokerCopier):
             self.copied_joker = candiadte.copied_joker
@@ -1700,20 +1679,20 @@ class JokerBrainstorm(JokerCopier):
             self.copied_joker = candiadte
         
         if self.copied_joker is self:
-            self.copied_joker = Joker('dummy')
+            self.copied_joker = Joker('dummy', event_bus=self.event_bus)
         print(f'{self.data.name} copying {self.copied_joker}')
 
 
 class JokerSatellite(Joker):
-    def __init__(self):
-        super().__init__(name='Satellite')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Satellite', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerShootTheMoon(Joker):
-    def __init__(self):
-        super().__init__(name='Shoot the Moon')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Shoot the Moon', event_bus=event_bus)
         self.data.cost = 5
     
     def trigger_on_card_in_hand(self, card, board):
@@ -1724,8 +1703,8 @@ class JokerShootTheMoon(Joker):
 
 
 class JokerDriversLicense(Joker):
-    def __init__(self):
-        super().__init__(name='Driver\'s License')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Driver\'s License', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.RARE
     
@@ -1738,22 +1717,22 @@ class JokerDriversLicense(Joker):
 
 
 class JokerCartomancer(Joker):
-    def __init__(self):
-        super().__init__(name='Cartomancer')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Cartomancer', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerAstronomer(Joker):
-    def __init__(self):
-        super().__init__(name='Astronomer')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Astronomer', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.UNCOMMON
 
 
 class JokerBurntJoker(Joker):
-    def __init__(self):
-        super().__init__(name='Burnt Joker')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Burnt Joker', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.RARE
 
@@ -1762,8 +1741,8 @@ class JokerBurntJoker(Joker):
 
 
 class JokerBootstraps(Joker):
-    def __init__(self):
-        super().__init__(name='Bootstraps')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Bootstraps', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
 
@@ -1776,8 +1755,8 @@ class JokerBootstraps(Joker):
 
 
 class JokerCanio(Joker):
-    def __init__(self):
-        super().__init__(name='Canio')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Canio', event_bus=event_bus)
         self.data.cost = 20
         self.rarity = Rarity.LEGENDARY
         self.mult = 1
@@ -1790,8 +1769,8 @@ class JokerCanio(Joker):
 
 
 class JokerTriboulet(Joker):
-    def __init__(self):
-        super().__init__(name='Triboulet')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Triboulet', event_bus=event_bus)
         self.data.cost = 20
         self.rarity = Rarity.LEGENDARY
 
@@ -1803,8 +1782,8 @@ class JokerTriboulet(Joker):
 
 
 class JokerYorick(Joker):
-    def __init__(self):
-        super().__init__(name='Yorick')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Yorick', event_bus=event_bus)
         self.data.cost = 20
         self.rarity = Rarity.LEGENDARY
         self.mult = 1
@@ -1825,14 +1804,14 @@ class JokerYorick(Joker):
 
 
 class JokerChicot(Joker):
-    def __init__(self):
-        super().__init__(name='Chicot')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Chicot', event_bus=event_bus)
         self.data.cost = 20
         self.rarity = Rarity.LEGENDARY
 
 
 class JokerPerkeo(Joker):
-    def __init__(self):
-        super().__init__(name='Perkeo')
+    def __init__(self, event_bus: EventBus):
+        super().__init__(name='Perkeo', event_bus=event_bus)
         self.data.cost = 20
         self.rarity = Rarity.LEGENDARY

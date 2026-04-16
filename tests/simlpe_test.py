@@ -6,22 +6,26 @@ from pathlib import Path
 
 sys.path.append(Path(__file__).parent.parent)
 
-from card import Card, CardData
-from board import Board
-from definitions import *
-from jokers import *
-from poker import asses_poker_hand
-from evaluation_rules import EvaluationRules
-
+from domain.card import Card, CardData
+from domain.board import Board
+from domain.definitions import *
+from domain.jokers import *
+from domain.poker import asses_poker_hand
+from domain.evaluation_rules import EvaluationRules
+from domain.factory import Factory
 
 class TestSimple(unittest.TestCase):
+    def setUp(self):
+        self.factory = Factory()
+
     def test_highcard(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.DIAMONDS, rank=Rank.FIVE),
+            card(suit=Suit.CLUBS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.EIGHT),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -30,12 +34,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_flush_four_fingers(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.DIAMONDS, rank=Rank.FIVE),
+            card(suit=Suit.CLUBS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.EIGHT),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -44,12 +49,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_flush_four_fingers(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SEVEN)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.DIAMONDS, rank=Rank.FIVE),
+            card(suit=Suit.DIAMONDS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.SEVEN),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -58,12 +64,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_four(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.ACE)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.HEARTS, rank=Rank.ACE),
+            card(suit=Suit.SPADES, rank=Rank.ACE),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -73,12 +80,13 @@ class TestSimple(unittest.TestCase):
     
 
     def test_three(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.HEARTS, rank=Rank.ACE),
+            card(suit=Suit.SPADES, rank=Rank.FIVE),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -88,12 +96,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.THREE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN)),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.THREE),
+            card(suit=Suit.CLUBS, rank=Rank.FIVE),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.SPADES, rank=Rank.SEVEN),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -103,12 +112,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_skipping(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.JACK)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.THREE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.SEVEN)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.NINE)),
+            card(suit=Suit.HEARTS, rank=Rank.JACK),
+            card(suit=Suit.DIAMONDS, rank=Rank.THREE),
+            card(suit=Suit.CLUBS, rank=Rank.SEVEN),
+            card(suit=Suit.DIAMONDS, rank=Rank.FIVE),
+            card(suit=Suit.SPADES, rank=Rank.NINE),
             ]
         evaluation_rules = EvaluationRules(straight_skip=True)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -118,12 +128,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_four_1(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.THREE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.KING)),
+            card(suit=Suit.HEARTS, rank=Rank.THREE),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.FIVE),
+            card(suit=Suit.DIAMONDS, rank=Rank.SIX),
+            card(suit=Suit.SPADES, rank=Rank.KING),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -133,12 +144,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_four_2(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.SPADES, rank=Rank.TWO)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.SEVEN)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SIX)),
+            card(suit=Suit.SPADES, rank=Rank.TWO),
+            card(suit=Suit.HEARTS, rank=Rank.SEVEN),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.FIVE),
+            card(suit=Suit.DIAMONDS, rank=Rank.SIX),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -148,12 +160,13 @@ class TestSimple(unittest.TestCase):
     
 
     def test_straight_four_3(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.SEVEN)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.EIGHT)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
+            card(suit=Suit.SPADES, rank=Rank.FIVE),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.SEVEN),
+            card(suit=Suit.CLUBS, rank=Rank.EIGHT),
+            card(suit=Suit.DIAMONDS, rank=Rank.EIGHT),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -163,12 +176,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_false(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.SIX)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.NINE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.TEN)),
+            card(suit=Suit.SPADES, rank=Rank.FIVE),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.DIAMONDS, rank=Rank.EIGHT),
+            card(suit=Suit.CLUBS, rank=Rank.NINE),
+            card(suit=Suit.DIAMONDS, rank=Rank.TEN),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -178,12 +192,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_straight_aces_high(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.JACK)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.QUEEN)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.KING)),
+            card(suit=Suit.SPADES, rank=Rank.FIVE),
+            card(suit=Suit.HEARTS, rank=Rank.JACK),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.QUEEN),
+            card(suit=Suit.CLUBS, rank=Rank.KING),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -192,12 +207,13 @@ class TestSimple(unittest.TestCase):
         self.assertEqual(played_cards, [cards[1], cards[2], cards[3], cards[4]])
 
     def test_straight_aces_low(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.THREE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.TWO)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.KING)),
+            card(suit=Suit.SPADES, rank=Rank.FOUR),
+            card(suit=Suit.HEARTS, rank=Rank.THREE),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.TWO),
+            card(suit=Suit.CLUBS, rank=Rank.KING),
             ]
         evaluation_rules = EvaluationRules(fingers=4)
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -207,12 +223,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_two_pair(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.FIVE)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.HEARTS, rank=Rank.FIVE),
+            card(suit=Suit.SPADES, rank=Rank.FIVE),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -222,12 +239,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_pair(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.ACE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.ACE),
+            card(suit=Suit.DIAMONDS, rank=Rank.ACE),
+            card(suit=Suit.HEARTS, rank=Rank.FIVE),
+            card(suit=Suit.SPADES, rank=Rank.SEVEN),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -237,12 +255,13 @@ class TestSimple(unittest.TestCase):
     
 
     def test_stones(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE, enhancement=Enhancement.STONE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.KING)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.FIVE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR),
+            card(suit=Suit.CLUBS, rank=Rank.ACE, enhancement=Enhancement.STONE),
+            card(suit=Suit.DIAMONDS, rank=Rank.KING),
+            card(suit=Suit.HEARTS, rank=Rank.FIVE),
+            card(suit=Suit.SPADES, rank=Rank.SEVEN),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)
@@ -251,12 +270,13 @@ class TestSimple(unittest.TestCase):
         self.assertEqual(played_cards, [cards[2]])
 
     def test_all_stones(self):
+        card = self.factory.card
         cards = [
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.FOUR, enhancement=Enhancement.STONE)),
-            Card(CardData(suit=Suit.CLUBS, rank=Rank.ACE, enhancement=Enhancement.STONE)),
-            Card(CardData(suit=Suit.DIAMONDS, rank=Rank.KING, enhancement=Enhancement.STONE)),
-            Card(CardData(suit=Suit.HEARTS, rank=Rank.FIVE, enhancement=Enhancement.STONE)),
-            Card(CardData(suit=Suit.SPADES, rank=Rank.SEVEN, enhancement=Enhancement.STONE)),
+            card(suit=Suit.DIAMONDS, rank=Rank.FOUR, enhancement=Enhancement.STONE),
+            card(suit=Suit.CLUBS, rank=Rank.ACE, enhancement=Enhancement.STONE),
+            card(suit=Suit.DIAMONDS, rank=Rank.KING, enhancement=Enhancement.STONE),
+            card(suit=Suit.HEARTS, rank=Rank.FIVE, enhancement=Enhancement.STONE),
+            card(suit=Suit.SPADES, rank=Rank.SEVEN, enhancement=Enhancement.STONE),
             ]
         evaluation_rules = EvaluationRules()
         hand_type, played_cards = asses_poker_hand(cards, evaluation_rules)

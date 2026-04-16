@@ -2,18 +2,21 @@
 from dataclasses import dataclass
 from typing import Protocol
 from random import randint
+from uuid import uuid4
 
-from definitions import *
+from domain.definitions import *
+
+from core.event_bus import EventBus, TriggerCard, TriggerEdition
 
 
 @dataclass
 class CardData:
-    suit: Suit
     rank: Rank
-    value_bonus: int = 0
+    suit: Suit
     enhancement: Enhancement = Enhancement.NONE
-    seal: Seal = Seal.NONE
     edition: Edition = Edition.BASE
+    seal: Seal = Seal.NONE
+    value_bonus: int = 0
 
 
 class BoardVision(Protocol):
@@ -25,8 +28,10 @@ class BoardVision(Protocol):
 
 
 class Card:
-    def __init__(self, data: CardData):
+    def __init__(self, data: CardData, event_bus: EventBus):
         self.data = data
+        self.id = uuid4()
+        self.event_bus = event_bus
     
     def is_suit(self, suit: Suit) -> bool:
         if self.data.enhancement == Enhancement.WILD:
@@ -63,42 +68,56 @@ class Card:
         return base_value + self.data.value_bonus
 
     def trigger_on_play(self, board: BoardVision) -> None:
-        # enhancements
-        if self.data.enhancement == Enhancement.BONUS:
-            board.add_chips(self.get_value() + 30)
-
-        elif self.data.enhancement == Enhancement.MULT:
-            board.add_chips(self.get_value())
-            board.add_mult(4)
-
-        elif self.data.enhancement == Enhancement.GLASS:
-            board.add_chips(self.get_value())
-            board.add_time_mult(2)
+        # chips
+        chips = 0
+        if self.data.enhancement == Enhancement.STONE:
+            chips = 50 + self.data.value_bonus
         
-        elif self.data.enhancement == Enhancement.STONE:
-            board.add_chips(50 + self.data.value_bonus)
+        elif self.data.enhancement == Enhancement.BONUS:
+            chips = self.get_value() + 30
+        
+        else:
+            chips = self.get_value()
+        
+        board.add_chips(chips)
+        self.event_bus.add_event(TriggerCard(self.id, chips=chips))
+
+        # mult
+        mult = 0
+        if self.data.enhancement == Enhancement.MULT:
+            mult = 4
 
         elif self.data.enhancement == Enhancement.LUCKY:
-            board.add_chips(self.get_value())
             if board.get_mode() == CalcMode.BEST:
-                board.add_mult(20)
+                mult = 20
             if board.get_mode() == CalcMode.SIMULATE:
                 if randint(1, 5) == 1:
-                    board.add_mult(20)
-
-        else:
-            board.add_chips(self.get_value())
+                    mult = 20
         
+        if mult > 0:
+            board.add_mult(mult)
+            self.event_bus.add_event(TriggerCard(self.id, mult=mult))
+
+        if self.data.enhancement == Enhancement.GLASS:
+            board.add_time_mult(2)
+            self.event_bus.add_event(TriggerCard(self.id, time_mult=2))
+        
+
         # editions
         if self.data.edition == Edition.FOIL:
             board.add_chips(50)
+            self.event_bus.add_event(TriggerEdition(self.id, self.data.edition))
 
         elif self.data.edition == Edition.HOLOGRAPHIC:
             board.add_mult(10)
+            self.event_bus.add_event(TriggerEdition(self.id, self.data.edition))
         
         elif self.data.edition == Edition.POLYCHROME:
             board.add_time_mult(1.5)
+            self.event_bus.add_event(TriggerEdition(self.id, self.data.edition))
+
 
     def trigger_in_hand_on_hand_end(self, board: BoardVision) -> None:
         if self.data.enhancement == Enhancement.STEEL:
             board.add_time_mult(1.5)
+            self.event_bus.add_event(TriggerCard(self.id, time_mult=1.5))

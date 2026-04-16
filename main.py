@@ -1,12 +1,26 @@
 
+import inspect
+import random
 
-from card import Card, CardData
-from board import Board
-from definitions import *
-from jokers import *
+from domain.card import Card, CardData
+from domain.board import Board
+from domain.definitions import *
+import domain.jokers as jokers
+from domain.jokers import *
+
+
 
 def main():
     board = Board()
+
+    jokers_classes = [
+        cls for _, cls in inspect.getmembers(jokers, inspect.isclass)
+        if cls.__module__ == jokers.__name__
+    ]
+    # board.jokers = [random.choice(jokers_classes)() for _ in range(5)]
+    # print(board.jokers)
+
+    board.jokers = [JokerAncientJoker(), JokerCampfire(), JokerBusinessCard(), JokerDusk(), JokerSteelJoker()]
 
     board.hand_cards = [
         Card(CardData(suit=Suit.HEARTS, rank=Rank.ACE)),
@@ -23,9 +37,6 @@ def main():
         Card(CardData(suit=Suit.DIAMONDS, rank=Rank.EIGHT)),
         ]
     
-    board.jokers = [
-        JokerRaisedFist(),
-    ]
 
     board.play()
 

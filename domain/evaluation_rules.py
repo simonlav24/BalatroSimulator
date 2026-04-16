@@ -2,8 +2,8 @@
 
 from dataclasses import dataclass
 
-from card import Card
-from definitions import Rank, Suit
+from domain.card import Card
+from domain.definitions import Rank, Suit
 
 @dataclass
 class EvaluationRules:

@@ -2,11 +2,11 @@
 
 from dataclasses import dataclass
 
-from card import Card
-from joker import Joker
-from poker import asses_poker_hand
-from definitions import *
-from evaluation_rules import EvaluationRules
+from domain.card import Card
+from domain.joker import Joker
+from domain.poker import asses_poker_hand
+from domain.definitions import *
+from domain.evaluation_rules import EvaluationRules
 
 
 class Board:

@@ -2,10 +2,13 @@
 from typing import Protocol
 from dataclasses import dataclass
 from math import floor
+from uuid import uuid4
 
-from definitions import *
-from card import Card
-from evaluation_rules import EvaluationRules
+from domain.definitions import *
+from domain.card import Card
+from domain.evaluation_rules import EvaluationRules
+
+from core.event_bus import EventBus
 
 
 @dataclass
@@ -33,10 +36,12 @@ class BoardVision(Protocol):
 
 
 class Joker:
-    def __init__(self, name: str):
+    def __init__(self, name: str, event_bus: EventBus):
         self.data = JokerData(name=name)
+        self.id = uuid4()
         self.active: bool = True
         self.rarity: Rarity = Rarity.COMMON
+        self.event_bus = event_bus
     
     def __repr__(self):
         return self.data.name
@@ -92,4 +97,32 @@ class Joker:
         buy_cost = floor((self.data.cost + edition_cost[self.data.edition]) * board.get_data().discount_percent)
         sell_cost = floor(buy_cost / 2)
         return sell_cost
+
+
+class JokerCopier(Joker):
+    def __init__(self, name: str, event_bus: EventBus):
+        super().__init__(name=name, event_bus=event_bus)
+        self.data.cost = 10
+        self.rarity = Rarity.RARE
+        self.copied_joker: Joker = Joker('dummy', event_bus=event_bus)
+
+    def trigger_on_start_hand(self, board: BoardVision) -> None:
+        self.copied_joker.trigger_on_start_hand(board)
+
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
+        self.copied_joker.trigger_on_end_hand(board)
     
+    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
+        self.copied_joker.trigger_on_play_card(card, board)
+    
+    def trigger_on_card_in_hand(self, card: Card, board: BoardVision) -> None:
+        self.copied_joker.trigger_on_card_in_hand(card, board)
+    
+    def trigger_on_discard_cards(self, cards: list[Card], board: BoardVision) -> None:
+        self.copied_joker.trigger_on_discard_cards(cards, board)
+
+    def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
+        return self.copied_joker.get_card_retriggers(card, board)
+    
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
+        return self.copied_joker.get_hand_card_retriggers(card, board)

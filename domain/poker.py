@@ -3,9 +3,9 @@
 from enum import Enum
 from collections import Counter
 
-from definitions import *
-from card import Card, CardData
-from evaluation_rules import EvaluationRules
+from domain.definitions import *
+from domain.card import Card, CardData
+from domain.evaluation_rules import EvaluationRules
 
 class HandEvaluator:
     def __init__(self, cards: list[Card], evaluation_rules: EvaluationRules):
