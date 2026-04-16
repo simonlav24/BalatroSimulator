@@ -10,7 +10,7 @@ class CardProtocol(Protocol):
 
 class DataRegistry:
     def __init__(self):
-        self.cards = {}
+        self.cards: dict[UUID, CardProtocol] = {}
     
     def register(self, card: CardProtocol) -> None:
         self.cards[card.id] = card

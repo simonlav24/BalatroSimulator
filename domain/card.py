@@ -121,3 +121,16 @@ class Card:
         if self.data.enhancement == Enhancement.STEEL:
             board.add_time_mult(1.5)
             self.event_bus.add_event(TriggerCard(self.id, time_mult=1.5))
+
+
+def create_standard_deck() -> list[CardData]:
+    deck: list[Card] = []
+    for rank in Rank:
+        if rank == Rank.NONE:
+            continue
+        for suit in Suit:
+            if suit in [Suit.NONE, Suit.ANY]:
+                continue
+            deck.append(CardData(rank, suit))
+    return deck
+

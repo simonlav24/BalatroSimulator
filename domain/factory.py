@@ -4,7 +4,7 @@ from domain.card import Card, CardData
 from domain.jokers import *
 
 from core.event_bus import EventBus
-from core.registry import DataRegistry
+from core.data_registry import DataRegistry
 
 class Factory:
     def __init__(self, event_bus: EventBus=None, registry: DataRegistry=None):

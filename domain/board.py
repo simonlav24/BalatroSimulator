@@ -12,11 +12,14 @@ from domain.evaluation_rules import EvaluationRules
 class Board:
     def __init__(self):
         self.data = BoardData()
-        self.hand_cards: list[Card] = []
+        self.jokers: list[Joker] = []
+
         self.selected_cards: list[Card] = []
         self.played_cards: list[Card] = []
-        self.jokers: list[Joker] = []
+        self.hand_cards: list[Card] = []
         self.full_deck: list[Card] = []
+        self.remaining_deck: list[Card] = []
+
         self.evaluation_rules = EvaluationRules()
 
         self.chips: int = 0
@@ -151,3 +154,4 @@ class Board:
 
     def get_current_hand_type(self) -> HandType:
         return self.current_hand_type
+    
