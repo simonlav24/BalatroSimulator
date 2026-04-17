@@ -2,6 +2,8 @@
 
 from dataclasses import dataclass
 
+from core.event_bus import EventBus, EventSelectCardsForPlay
+
 from domain.card import Card
 from domain.joker import Joker
 from domain.poker import asses_poker_hand
@@ -29,7 +31,7 @@ class Board:
         self.levels: dict[HandType, dict[str, int]] = {hand_type: {'level': 1, 'played': 0} for hand_type in HandType}
         self.calc_mode: CalcMode = CalcMode.BEST
 
-    def play(self):
+    def play(self, event_bus: EventBus):
         self.data.remaining_hands -= 1
 
         # handle evaluation rules
@@ -45,6 +47,9 @@ class Board:
         
         if self.evaluation_rules.play_all_cards:
             self.played_cards = self.selected_cards
+        
+        # event for chosen played cards
+        event_bus.add_event(EventSelectCardsForPlay([card.id for card in self.played_cards]))
 
         # start from hand type base level
         chips, mult = get_hand_level_chips_mult(self.current_hand_type, self.levels[self.current_hand_type]['level'])

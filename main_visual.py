@@ -17,9 +17,9 @@ def initialize_data() -> Director:
     for card in deck:
         director.add_card_to_deck(card)
     
-    director.deck_player.reset()
-    director.deck_player.shuffle()
-    director.deck_player.draw_cards(8)
+    director.board_player.reset()
+    director.board_player.shuffle()
+    director.board_player.draw_cards(8)
 
     return director
 
@@ -55,9 +55,7 @@ def main():
         win.fill((0, 0, 0))
         
         director.renderer.draw(win)
-        
 
-        
         # Update display
         pygame.display.flip()
 

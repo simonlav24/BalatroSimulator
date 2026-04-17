@@ -15,5 +15,5 @@ class DataRegistry:
     def register(self, card: CardProtocol) -> None:
         self.cards[card.id] = card
     
-    def get(self, id: UUID) -> CardProtocol:
-        return self.cards[id]
+    def __getitem__(self, key: UUID) -> CardProtocol:
+        return self.cards[key]

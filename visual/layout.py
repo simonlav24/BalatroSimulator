@@ -13,7 +13,7 @@ def flow(x: float) -> float:
                   0.05 * sin(time.perf_counter() * 3 + 0.08 * x))
 
 def spread(x: float, l: int) -> float:
-    return - 2 * (0.2 / l) * (x - l) - 0.2
+    return - 2 * (0.15 / l) * (x - l) - 0.15
 
 class CardRow:
     def __init__(self, pos, width):
@@ -35,7 +35,13 @@ class CardRow:
                 pos[1] -= 30
             card.set_pos(pos)
             x += spacing
-    
+
+    def pop_selected(self) -> list[CardView]:
+        selected = [card for card in self.cards if card.is_selected]
+        for card in selected:
+            self.cards.remove(card)
+        return selected
+
     def step(self) -> None:
         for i, card in enumerate(self.cards):
             angle = spread(i, len(self.cards))

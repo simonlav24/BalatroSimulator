@@ -14,3 +14,5 @@ class Renderer:
         # draw cards in hand
         for card in self.board.get_hand_cards():
             self.view_reg[card.id].draw(win)
+        for card in self.board.get_selected_cards():
+            self.view_reg[card.id].draw(win)
