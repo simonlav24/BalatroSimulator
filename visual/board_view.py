@@ -20,7 +20,7 @@ class BoardView:
 
         self.hand_row = CardRow(Vector2(win_size[0] / 2, 500), 400)
         self.played_row = CardRow(Vector2(win_size[0] / 2, 300), 400)
-        # self.joker_row = CardRow(pos=..., width=...)
+        self.joker_row = CardRow(Vector2(win_size[0] / 2, 100), 400)
 
     def sync_to_board(self, board: Board, selected_cards: list[CardView]):
         board.selected_cards = [
@@ -28,6 +28,9 @@ class BoardView:
         ]
         board.hand_cards = [
             self.data_reg[card.id] for card in self.hand_row.cards
+        ]
+        board.jokers = [
+            self.data_reg[card.id] for card in self.joker_row.cards
         ]
 
     def sync_with_board(self, board: Board):
@@ -37,20 +40,15 @@ class BoardView:
         self.played_row.cards = [
             self.view_reg[card.id] for card in board.get_selected_cards()
         ]
-
-        # self.joker_row.cards = [
-        #     self.view_registry[cid] for cid in board.joker
-        # ]
+        self.joker_row.cards = [
+            self.view_reg[card.id] for card in board.get_jokers()
+        ]
 
     def step(self):
-        self.hand_row.recalc()
-        self.hand_row.step()
-        for card in self.hand_row.cards:
-            card.step()
-        
-        self.played_row.recalc()
-        self.played_row.step()
-        for card in self.played_row.cards:
-            card.step()
+        for row in [self.hand_row, self.played_row, self.joker_row]:
+            row.recalc()
+            row.step()
+            for card in row.cards:
+                card.step()
 
         

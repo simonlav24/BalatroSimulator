@@ -44,3 +44,6 @@ enhancement_map = {
     Enhancement.GLASS: (5, 1),
 }
 
+jokers_map = {
+    'Joker': (0,0),
+}

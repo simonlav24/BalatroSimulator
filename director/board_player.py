@@ -4,6 +4,8 @@ from random import shuffle
 
 from core.event_bus import EventBus, EventPlayHand, EventSelectCardsForPlay
 from domain.board import Board
+from domain.card import Card
+from domain.joker import Joker
 
 from visual.board_view import BoardView
 from visual.animation_system import AnimationSystem
@@ -52,7 +54,12 @@ class BoardPlayer:
         # events now stored in event_bus. play animations
         self.anim_sys.play_game(self.event_bus)
         
-
+    def add_card_to_deck(self, card: Card) -> None:
+        self.board.full_deck.append(card)
+    
+    def add_joker(self, joker: Joker) -> None:
+        self.board.jokers.append(joker)
+        self.board_view.sync_with_board(self.board)
 
     def handle_event(self, event) -> None:
         if isinstance(event, EventPlayHand):

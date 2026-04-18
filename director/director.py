@@ -1,22 +1,22 @@
 
-from pygame import Surface
 
-from domain.definitions import Rank, Suit
 from domain.board import Board
 from domain.card import CardData, Card
+from domain.joker import Joker
 from domain.factory import Factory
 
 from core.event_bus import EventBus
 from core.data_registry import DataRegistry
 
 from visual.view_registry import ViewRegistry
-from visual.card_view import CardView, create_card_surf
+from visual.card_view import CardView, create_card_surf, create_joker_surf
 from visual.renderer import Renderer
 from visual.input_system import InputSystem
 from visual.animation_system import AnimationSystem
 from visual.board_view import BoardView
 
 from director.board_player import BoardPlayer
+from director.card_factory import CardFactory
 
 
 class Director:
@@ -34,14 +34,11 @@ class Director:
         self.animation_system = AnimationSystem(self.view_registry)
         self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system)
     
-    def add_card_to_deck(self, card_data: CardData) -> None:
-        card = Card(card_data, self.event_bus)
-        self.data_registry.register(card)
-        self.board.full_deck.append(card)
+    def get_card_factory(self) -> CardFactory:
+        return CardFactory(self.data_registry, self.event_bus, self.view_registry)
 
-        surf = create_card_surf(card_data)
-        card_view = CardView(card.id, surf)
-        self.view_registry.register(card_view)
+    def get_player(self) -> BoardPlayer:
+        return self.board_player
 
     def step(self) -> None:
         # handle game events

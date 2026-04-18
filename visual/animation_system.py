@@ -35,6 +35,17 @@ class AnimCardNudge(Animation):
         self.is_done = True
 
 
+class AnimCardSelect(Animation):
+    def __init__(self, card_view: CardView):
+        super().__init__()
+        self.card = card_view
+    
+    def step(self):
+        self.card.is_selected = True
+        print('selecting card')
+        self.is_done = True
+
+
 class AnimWait(Animation):
     def __init__(self, time: int):
         super().__init__()
@@ -46,6 +57,8 @@ class AnimWait(Animation):
             self.is_done = True
 
 
+class AnimClearOut(Animation):
+    ...
 
 
 class AnimationSystem:
@@ -72,7 +85,12 @@ class AnimationSystem:
             
             if isinstance(event, TriggerCard):
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
-                self.animation_queue.append(AnimWait(FPS))
+                self.animation_queue.append(AnimWait(FPS * 0.5))
+            
+            if isinstance(event, EventSelectCardsForPlay):
+                for card in [self.view_reg[id] for id in event.card_ids]:
+                    self.animation_queue.append(AnimCardSelect(card))
+                    self.animation_queue.append(AnimWait(FPS * 0.25))
         
         self.play()
     

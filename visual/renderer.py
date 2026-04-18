@@ -16,3 +16,5 @@ class Renderer:
             self.view_reg[card.id].draw(win)
         for card in self.board.get_selected_cards():
             self.view_reg[card.id].draw(win)
+        for card in self.board.get_jokers():
+            self.view_reg[card.id].draw(win)

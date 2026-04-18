@@ -39,6 +39,7 @@ class CardRow:
     def pop_selected(self) -> list[CardView]:
         selected = [card for card in self.cards if card.is_selected]
         for card in selected:
+            card.is_selected = False
             self.cards.remove(card)
         return selected
 

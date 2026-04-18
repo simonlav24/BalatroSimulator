@@ -7,19 +7,25 @@ import pygame
 from pygame import Vector2
 
 from domain.card import create_standard_deck
+from domain.jokers import JokerJimbo
 
 from director.director import Director
 
 
 def initialize_data() -> Director:
     director = Director()
+    factory = director.get_card_factory()
+    player = director.get_player()
+
     deck = create_standard_deck()
     for card in deck:
-        director.add_card_to_deck(card)
-    
-    director.board_player.reset()
-    director.board_player.shuffle()
-    director.board_player.draw_cards(8)
+        new_card = factory.create_playing_card(card.rank, card.suit)
+        player.add_card_to_deck(new_card)
+    player.add_joker(factory.create_joker_card(JokerJimbo))
+
+    player.reset()
+    player.shuffle()
+    player.draw_cards(8)
 
     return director
 
@@ -36,17 +42,22 @@ def main():
     FPS = 60
 
     director = initialize_data()
+    factory = director.get_card_factory()
+    player = director.get_player()
 
     # Main loop
-    running = True
-    while running:
+    done = False
+    while not done:
         clock.tick(FPS)
         
         for event in pygame.event.get():
             director.input_system.handle_event(event)
 
-            if event.type == pygame.QUIT:
-                running = False
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
+                player.add_joker(factory.create_joker_card(JokerJimbo))
+
+            if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
+                done = True
         
         # step
         director.step()

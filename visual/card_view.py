@@ -1,7 +1,7 @@
 
 
 from uuid import UUID
-from random import randint, choice
+from random import randint, choice, uniform
 from enum import Enum
 from math import atan, radians, degrees
 
@@ -24,6 +24,9 @@ def create_card_surf(data: CardData) -> Surface:
     # todo: seal
 
     return card_surf
+
+def create_joker_surf(name: str) -> Surface:
+    return card_surf_at(jokers_texture, *jokers_map[name])
 
 
 class MotionVector:
@@ -83,7 +86,7 @@ class CardView:
         surf.blit(transformed, self.pos() - Vector2(transformed.get_size()) / 2)
     
     def nudge(self, factor: float=1.0) -> None:
-        self.angle.nudge(choice([10 * factor, -10 * factor]))
+        self.angle.nudge(uniform(7 * factor, -7 * factor))
         self.scale.nudge(5 * factor)
 
 
