@@ -2,7 +2,7 @@
 
 from dataclasses import dataclass
 
-from core.event_bus import EventBus, EventSelectCardsForPlay
+from core.event_bus import EventBus, EventSelectCardsForPlay, EventStartPlay
 
 from domain.card import Card
 from domain.joker import Joker
@@ -49,6 +49,7 @@ class Board:
             self.played_cards = self.selected_cards
         
         # event for chosen played cards
+        event_bus.add_event(EventStartPlay())
         event_bus.add_event(EventSelectCardsForPlay([card.id for card in self.played_cards]))
 
         # start from hand type base level

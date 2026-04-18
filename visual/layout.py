@@ -5,6 +5,7 @@ import time
 import pygame
 from pygame import Vector2, Surface
 
+from core.id_gen import id_type
 from visual.card_view import CardView
 
 def flow(x: float) -> float:
@@ -21,6 +22,12 @@ class CardRow:
         self.width = width
         self.cards: list[CardView] = []
 
+    def add(self, card: CardView, index: int=-1) -> None:
+        self.cards.insert(index, card)
+    
+    def remove(self, card: CardView) -> None:
+        self.cards.remove(card)
+
     def recalc(self) -> None:
         if len(self.cards) == 1:
             x = self.width / 2
@@ -36,12 +43,8 @@ class CardRow:
             card.set_pos(pos)
             x += spacing
 
-    def pop_selected(self) -> list[CardView]:
-        selected = [card for card in self.cards if card.is_selected]
-        for card in selected:
-            card.is_selected = False
-            self.cards.remove(card)
-        return selected
+    def get_selected(self) -> list[id_type]:
+        return [card.id for card in self.cards if card.is_selected]
 
     def step(self) -> None:
         for i, card in enumerate(self.cards):

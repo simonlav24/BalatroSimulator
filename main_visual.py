@@ -10,7 +10,7 @@ from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
 
 from director.director import Director
-
+from visual.definitions import win_size
 
 def initialize_data() -> Director:
     director = Director()
@@ -26,14 +26,13 @@ def initialize_data() -> Director:
     player.reset()
     player.shuffle()
     player.draw_cards(8)
+    player.flush_animation()
 
     return director
 
 def main():
     pygame.init()
 
-    # Screen dimensions
-    win_size = Vector2(1280, 720)
     win = pygame.display.set_mode(win_size)
     pygame.display.set_caption("Balatro Simulator")
 

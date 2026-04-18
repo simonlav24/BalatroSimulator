@@ -13,6 +13,7 @@ cards_texture = pygame.image.load(cards_texture_path)
 card_backs_texture = pygame.image.load(card_backs_texture_path)
 jokers_texture = pygame.image.load(jokers_texture_path)
 
+win_size = Vector2(1280, 720)
 CARD_SIZE = Vector2(71, 95)
 
 def card_surf_at(texture: pygame.Surface, x: int, y: int) -> pygame.Surface:

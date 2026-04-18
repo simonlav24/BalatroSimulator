@@ -27,12 +27,12 @@ class Director:
         self.view_registry = ViewRegistry()
         self.factory = Factory(self.event_bus, self.data_registry)
 
-        self.renderer = Renderer(self.board, self.view_registry)
         self.board_view = BoardView(self.view_registry, self.data_registry)
+        self.renderer = Renderer(self.board_view, self.view_registry)
 
-        self.input_system = InputSystem(self.board_view, self.event_bus)
-        self.animation_system = AnimationSystem(self.view_registry)
-        self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system)
+        self.animation_system = AnimationSystem(self.view_registry, self.board_view)
+        self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system, self.data_registry, self.view_registry)
+        self.input_system = InputSystem(self.board_view, self.board_player)
     
     def get_card_factory(self) -> CardFactory:
         return CardFactory(self.data_registry, self.event_bus, self.view_registry)
@@ -41,17 +41,9 @@ class Director:
         return self.board_player
 
     def step(self) -> None:
-        # handle game events
-        for event in self.event_bus.get_game_queue():
-            self.handle_event(event)
-
         self.board_view.step()
         self.animation_system.step()
 
-    def handle_event(self, event) -> None:
-        self.board_player.handle_event(event)
-
-    
 
 
 

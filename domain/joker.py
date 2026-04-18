@@ -2,7 +2,7 @@
 from typing import Protocol
 from dataclasses import dataclass
 from math import floor
-from uuid import uuid4
+from core.id_gen import id_type, gen_id
 
 from domain.definitions import *
 from domain.card import Card
@@ -38,7 +38,7 @@ class BoardVision(Protocol):
 class Joker:
     def __init__(self, name: str, event_bus: EventBus):
         self.data = JokerData(name=name)
-        self.id = uuid4()
+        self.id = gen_id()
         self.active: bool = True
         self.rarity: Rarity = Rarity.COMMON
         self.event_bus = event_bus

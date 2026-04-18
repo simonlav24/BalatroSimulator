@@ -52,7 +52,7 @@ def main():
     print(f'chips: {chips}, mult: {mult}')
     for event in factory.event_bus.queue:
         print(f'card {factory.registry.get(event.id)}: {event}')
-        if isinstance(event, TriggerCard):
+        if isinstance(event, EventTriggerCard):
             chips += event.chips
             mult += event.mult
             if event.time_mult > 0:

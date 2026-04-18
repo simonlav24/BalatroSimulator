@@ -8,7 +8,7 @@ from domain.card import Card
 from domain.definitions import *
 from domain.poker import HandEvaluator
 
-from core.event_bus import EventBus, TriggerCard
+from core.event_bus import EventBus, EventTriggerCard
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class JokerJimbo(Joker):
     def trigger_on_end_hand(self, board: BoardVision):
         board.add_mult(4)
         logger.info(f'{self.data.name} added 4 mult')
-        self.event_bus.add_event(TriggerCard(self.id, mult=4))
+        self.event_bus.add_event(EventTriggerCard(self.id, mult=4))
         super().trigger_on_end_hand(board)
 
 
@@ -33,7 +33,7 @@ class JokerGreedy(Joker):
         if card.is_suit(Suit.DIAMONDS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
-            self.event_bus.add_event(TriggerCard(self.id, mult=3))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=3))
         super().trigger_on_play_card(card, board)
 
 
@@ -46,7 +46,7 @@ class JokerLusty(Joker):
         if card.is_suit(Suit.HEARTS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
-            self.event_bus.add_event(TriggerCard(self.id, mult=3))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=3))
         super().trigger_on_play_card(card, board)
 
 
@@ -59,7 +59,7 @@ class JokerWrathful(Joker):
         if card.is_suit(Suit.SPADES):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
-            self.event_bus.add_event(TriggerCard(self.id, mult=3))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=3))
         super().trigger_on_play_card(card, board)
 
 
@@ -72,7 +72,7 @@ class JokerGluttonous(Joker):
         if card.is_suit(Suit.CLUBS):
             board.add_mult(3)
             logger.info(f'{self.data.name} added 3 mult')
-            self.event_bus.add_event(TriggerCard(self.id, mult=3))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=3))
         super().trigger_on_play_card(card, board)
 
 
@@ -86,7 +86,7 @@ class JokerJollyJoker(Joker):
         if evaluator.check_pair() is not None:
             board.add_mult(8)
             logger.info(f'{self.data.name} added 8 mult')
-            self.event_bus.add_event(TriggerCard(self.id, mult=8))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=8))
         super().trigger_on_end_hand(board)
 
 
@@ -364,7 +364,7 @@ class JokerRaisedFist(Joker):
         cards.sort(key=lambda x: x.get_rank().value)
         mult = 2 * base_value_map[cards[0].get_rank()]
         board.add_mult(mult)
-        self.event_bus.add_event(TriggerCard(self.id, mult=mult))
+        self.event_bus.add_event(EventTriggerCard(self.id, mult=mult))
         logger.info(f'{self.data.name} added {mult} mult')
         super().trigger_on_end_hand(board)
 

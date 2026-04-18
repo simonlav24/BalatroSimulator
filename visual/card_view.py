@@ -1,10 +1,10 @@
 
 
-from uuid import UUID
 from random import randint, choice, uniform
 from enum import Enum
 from math import atan, radians, degrees
 
+from core.id_gen import id_type
 from visual.definitions import *
 from domain.card import CardData
 
@@ -57,8 +57,8 @@ class MotionVector:
 
 
 class CardView:
-    def __init__(self, id: UUID, surf: Surface):
-        self.id: UUID = id
+    def __init__(self, id: id_type, surf: Surface):
+        self.id: id_type = id
         self.surf = surf
 
         self.pos = MotionVector(Vector2(), lambda a, b: (a - b).length())
@@ -68,6 +68,9 @@ class CardView:
         self.is_hovered = False
         self.is_selected = False
         self.is_dragged = False
+
+    def __repr__(self):
+        return f'CardView({self.id})'
 
     def set_pos(self, pos: Vector2) -> None:
         self.pos.set(pos)
@@ -90,7 +93,7 @@ class CardView:
         self.scale.nudge(5 * factor)
 
 
-def create_card_view(card: CardData, id: UUID) -> CardView:
+def create_card_view(card: CardData, id: id_type) -> CardView:
     surf = create_card_surf(card)
     view = CardView(id, surf)
     return view

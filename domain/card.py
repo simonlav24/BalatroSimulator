@@ -2,11 +2,11 @@
 from dataclasses import dataclass
 from typing import Protocol
 from random import randint
-from uuid import uuid4
+from core.id_gen import gen_id
 
 from domain.definitions import *
 
-from core.event_bus import EventBus, TriggerCard, TriggerEdition
+from core.event_bus import EventBus, EventTriggerCard, TriggerEdition
 
 
 @dataclass
@@ -30,7 +30,7 @@ class BoardVision(Protocol):
 class Card:
     def __init__(self, data: CardData, event_bus: EventBus):
         self.data = data
-        self.id = uuid4()
+        self.id = gen_id()
         self.event_bus = event_bus
     
     def is_suit(self, suit: Suit) -> bool:
@@ -80,7 +80,7 @@ class Card:
             chips = self.get_value()
         
         board.add_chips(chips)
-        self.event_bus.add_event(TriggerCard(self.id, chips=chips))
+        self.event_bus.add_event(EventTriggerCard(self.id, chips=chips))
 
         # mult
         mult = 0
@@ -96,11 +96,11 @@ class Card:
         
         if mult > 0:
             board.add_mult(mult)
-            self.event_bus.add_event(TriggerCard(self.id, mult=mult))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=mult))
 
         if self.data.enhancement == Enhancement.GLASS:
             board.add_time_mult(2)
-            self.event_bus.add_event(TriggerCard(self.id, time_mult=2))
+            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=2))
         
 
         # editions
@@ -120,7 +120,7 @@ class Card:
     def trigger_in_hand_on_hand_end(self, board: BoardVision) -> None:
         if self.data.enhancement == Enhancement.STEEL:
             board.add_time_mult(1.5)
-            self.event_bus.add_event(TriggerCard(self.id, time_mult=1.5))
+            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=1.5))
 
 
 def create_standard_deck() -> list[CardData]:
