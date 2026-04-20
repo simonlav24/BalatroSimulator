@@ -3,6 +3,7 @@
 from random import shuffle
 
 from core.event_bus import (
+    BoardArea,
     EventBus,
     EventClearOut,
     EventDiscardCard,
@@ -60,7 +61,11 @@ class BoardPlayer:
             if card.id in drawn_cards_ids:
                 index_in_hand = self.board.hand_cards.index(card)
                 self.event_bus.add_event(EventDrawCard(card.id, index_in_hand))
-    
+
+    def add_joker(self, joker: Joker) -> None:
+        self.board.jokers.append(joker)
+        self.event_bus.add_event(EventDrawCard(joker.id, self.board.jokers.index(joker), BoardArea.JOKER))
+
     def _sort(self) -> None:
         self.board.hand_cards.sort(key=lambda x: (x.get_rank().value, x.data.suit.value), reverse=True)
 
@@ -114,6 +119,4 @@ class BoardPlayer:
     def add_card_to_deck(self, card: Card) -> None:
         self.board.full_deck.append(card)
     
-    def add_joker(self, joker: Joker) -> None:
-        self.board.jokers.append(joker)
 

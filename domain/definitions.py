@@ -152,3 +152,8 @@ edition_cost = {
     Edition.POLYCHROME: 5,
     Edition.NEGATIVE: 5,
 }
+
+class CardType(Enum):
+    PLAYING = 0
+    JOKER = 1
+    CONSUMABLE = 2

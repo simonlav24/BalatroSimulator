@@ -3,6 +3,7 @@ from typing import Callable, Any
 from enum import Enum
 
 from core.event_bus import (
+    BoardArea,
     EventBus, 
     EventSelectCardsForPlay,
     EventTriggerCard, 
@@ -17,8 +18,11 @@ from core.event_bus import (
 from visual.card_view import CardView
 from visual.view_registry import ViewRegistry
 from visual.board_view import BoardView
+from visual.layout import CardRow
 
 FPS = 60
+
+DEBUG = False
 
 class State(Enum):
     IDLE = 0
@@ -41,7 +45,7 @@ class AnimCardNudge(Animation):
     
     def step(self):
         self.card.nudge()
-        print('nudgin card')
+        if DEBUG: print('nudgin card')
         self.is_done = True
 
 
@@ -52,7 +56,7 @@ class AnimCardSelect(Animation):
     
     def step(self):
         self.card.is_selected = not self.card.is_selected
-        print('selecting card')
+        if DEBUG: print('selecting card')
         self.is_done = True
 
 
@@ -84,7 +88,7 @@ class AnimRecalc(Animation):
         self.board_view = board_view
     
     def step(self):
-        print('recalculating positions')
+        if DEBUG: print('recalculating positions')
         self.board_view.recalculate_positions()
         self.is_done = True
 
@@ -159,10 +163,13 @@ class AnimationSystem:
             
             elif isinstance(event, EventDrawCard):
                 card_id = event.card_id
-                # self.board_view.hand_row.add(self.view_reg[card_id], event.drawn_index)
-                def add(id, drawn_index):
-                    self.board_view.hand_row.add(self.view_reg[id], drawn_index)
-                self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index]))
+                def add(id, drawn_index, board_area):
+                    area: dict[BoardArea, CardRow] = {
+                        BoardArea.HAND: self.board_view.hand_row,
+                        BoardArea.JOKER: self.board_view.joker_row,
+                    }
+                    area[board_area].add(self.view_reg[id], drawn_index)
+                self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index, event.board_area]))
                 self.animation_queue.append(AnimRecalc(self.board_view))
                 self.animation_queue.append(AnimWait(FPS * 0.1))
     

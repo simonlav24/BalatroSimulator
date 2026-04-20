@@ -1,10 +1,16 @@
 
 
 from dataclasses import dataclass
+from enum import Enum
 
 from core.id_gen import id_type
-from domain.definitions import Edition
+from domain.definitions import Edition, CardType
 
+class BoardArea(Enum):
+    HAND = 0
+    PLAYED = 1
+    JOKER = 2
+    DISCARD = 3
 
 @dataclass
 class EventTriggerCard:
@@ -42,7 +48,7 @@ class EventDiscardCard:
 class EventDrawCard:
     card_id: id_type
     drawn_index: int = -1
-
+    board_area: BoardArea = BoardArea.HAND
 
 class EventBus:
     def __init__(self):
