@@ -152,8 +152,6 @@ class AnimationSystem:
             
             elif isinstance(event, EventDiscardCard):
                 card_id = event.card_id
-                # self.board_view.hand_row.remove(self.view_reg[card_id])
-                # self.board_view.discard_pile.add(self.view_reg[card_id])
                 def remove(id):
                     self.board_view.hand_row.remove(self.view_reg[id])
                     self.board_view.discard_pile.add(self.view_reg[id])

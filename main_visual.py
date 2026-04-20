@@ -54,6 +54,7 @@ def main():
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
                 player.add_joker(factory.create_joker_card(JokerJimbo))
+                player.flush_animation()
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True

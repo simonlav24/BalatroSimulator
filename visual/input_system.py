@@ -20,20 +20,22 @@ class InputSystem:
         if event.type == pygame.MOUSEMOTION:
             self.hovered = None
 
-            for card in reversed(self.board_view.hand_row.cards):
+            hover_test = self.board_view.hand_row.cards + self.board_view.played_row.cards + self.board_view.joker_row.cards
+
+            for card in reversed(hover_test):
                 rect = Rect(*(card.pos() - CARD_SIZE / 2), *CARD_SIZE)
                 if(rect.collidepoint(event.pos)):
                     self.hovered = card
                     break
             
-            for card in self.board_view.hand_row.cards:
+            for card in hover_test:
                 card.is_hovered = self.hovered == card
         
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hovered is not None:
-                # self.hovered.nudge(0.5)
+                print(f"Clicked on card {self.hovered.id}")
                 self.hovered.is_selected = not self.hovered.is_selected
-                self.board_view.hand_row.recalc()
+                self.board_view.recalculate_positions()
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             self.player.play()
