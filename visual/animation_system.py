@@ -11,6 +11,7 @@ from core.event_bus import (
     EventDiscardCard,
     EventStartPlay,
     EventDrawCard,
+    EventDeselect,
 )
 
 from visual.card_view import CardView
@@ -50,7 +51,7 @@ class AnimCardSelect(Animation):
         self.card = card_view
     
     def step(self):
-        self.card.is_selected = True
+        self.card.is_selected = not self.card.is_selected
         print('selecting card')
         self.is_done = True
 
@@ -110,24 +111,38 @@ class AnimationSystem:
     def set_up(self, event_bus: EventBus):
         for event in event_bus.get_round_queue():
             if isinstance(event, EventStartPlay):
-                # self.animation_queue.append(AnimWait(FPS))
-                ...
+                # remove from row and add to play area
+                for card in [self.view_reg[id] for id in event.card_ids]:
+                    self.board_view.hand_row.remove(card)
+                    self.board_view.played_row.add(card)
+                    self.animation_queue.append(AnimRecalc(self.board_view))
+                    self.animation_queue.append(AnimWait(FPS * 0.25))
 
             elif isinstance(event, EventTriggerCard):
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
                 self.animation_queue.append(AnimWait(FPS * 0.5))
             
             elif isinstance(event, EventSelectCardsForPlay):
-                # remove from row and add to play area
-                for card in [self.view_reg[id] for id in event.card_ids]:
-                    self.board_view.hand_row.remove(card)
-                    self.board_view.played_row.add(card)
-                self.animation_queue.append(AnimRecalc(self.board_view))
+                # select playable cards
                 for card in [self.view_reg[id] for id in event.card_ids]:
                     self.animation_queue.append(AnimCardSelect(card))
+                    self.animation_queue.append(AnimRecalc(self.board_view))
                     self.animation_queue.append(AnimWait(FPS * 0.25))
+                self.animation_queue.append(AnimWait(FPS * 0.25))
+            
+            elif isinstance(event, EventDeselect):
+                for card in [self.view_reg[id] for id in event.card_ids]:
+                    self.animation_queue.append(AnimCardSelect(card))
+                self.animation_queue.append(AnimRecalc(self.board_view))
+                self.animation_queue.append(AnimWait(FPS * 1))
             
             elif isinstance(event, EventClearOut):
+                def clear_out():
+                    cards = self.board_view.played_row.cards.copy()
+                    for card in cards:
+                        self.board_view.played_row.remove(card)
+                        self.board_view.discard_pile.add(card)
+                self.animation_queue.append(AnimFunc(clear_out, []))
                 self.animation_queue.append(AnimRecalc(self.board_view))
                 self.animation_queue.append(AnimWait(FPS * 0.25))
             
@@ -140,7 +155,7 @@ class AnimationSystem:
                     self.board_view.discard_pile.add(self.view_reg[id])
                 self.animation_queue.append(AnimFunc(remove, [card_id]))
                 self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimWait(FPS * 0.25))
+                self.animation_queue.append(AnimWait(FPS * 0.1))
             
             elif isinstance(event, EventDrawCard):
                 card_id = event.card_id
@@ -149,7 +164,7 @@ class AnimationSystem:
                     self.board_view.hand_row.add(self.view_reg[id], drawn_index)
                 self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index]))
                 self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimWait(FPS * 0.25))
+                self.animation_queue.append(AnimWait(FPS * 0.1))
     
     def play(self):
         self.state = State.RUNNING

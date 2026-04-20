@@ -23,7 +23,10 @@ class CardRow:
         self.cards: list[CardView] = []
 
     def add(self, card: CardView, index: int=-1) -> None:
-        self.cards.insert(index, card)
+        if index == -1:
+            self.cards.append(card)
+        else:
+            self.cards.insert(index, card)
     
     def remove(self, card: CardView) -> None:
         self.cards.remove(card)

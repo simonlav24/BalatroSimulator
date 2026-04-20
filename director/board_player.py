@@ -2,7 +2,15 @@
 
 from random import shuffle
 
-from core.event_bus import EventBus, EventClearOut, EventDiscardCard, EventDrawCard
+from core.event_bus import (
+    EventBus,
+    EventClearOut,
+    EventDiscardCard,
+    EventDrawCard,
+    EventStartPlay,
+    EventSelectCardsForPlay,
+    EventDeselect,
+)
 from core.data_registry import DataRegistry
 from domain.board import Board
 from domain.card import Card
@@ -66,8 +74,21 @@ class BoardPlayer:
             self.board.hand_cards.remove(card)
             self.board.selected_cards.append(card)
 
+        # event for chosen played cards
+        self.event_bus.add_event(EventStartPlay(selected_cards_ids))
+
+        self.board.play_initialize()
+        self.event_bus.add_event(EventSelectCardsForPlay([card.id for card in self.board.get_played_cards()]))
         # play board and create events
-        self.board.play(self.event_bus)
+        self.board.play()
+
+        # deselect cards
+        self.event_bus.add_event(EventDeselect([card.id for card in self.board.get_played_cards()]))
+
+        # discard played cards
+        for card in [self.data_reg[id] for id in selected_cards_ids]:
+            self.board.selected_cards.remove(card)
+
         self.event_bus.add_event(EventClearOut())
 
     def discard(self) -> None:

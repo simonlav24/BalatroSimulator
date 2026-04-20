@@ -23,8 +23,12 @@ class EventSelectCardsForPlay:
     card_ids: list[id_type]
 
 @dataclass
+class EventDeselect:
+    card_ids: list[id_type]
+
+@dataclass
 class EventStartPlay:
-    ...
+    card_ids: list[id_type]
 
 @dataclass
 class EventClearOut:
