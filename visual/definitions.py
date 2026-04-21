@@ -16,6 +16,8 @@ jokers_texture = pygame.image.load(jokers_texture_path)
 win_size = Vector2(1280, 720)
 CARD_SIZE = Vector2(71, 95)
 
+FPS = 60
+
 def card_surf_at(texture: pygame.Surface, x: int, y: int) -> pygame.Surface:
     surf = pygame.Surface(CARD_SIZE, pygame.SRCALPHA)
     surf.blit(texture, (0, 0), (x * CARD_SIZE[0], y * CARD_SIZE[1], *CARD_SIZE))

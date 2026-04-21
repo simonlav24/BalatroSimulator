@@ -80,6 +80,10 @@ class CardView:
             self.scale.set(1.2)
         else:
             self.scale.set(1.0)
+        
+        # if abs(self.pos.vel.x) > 100:
+        #     self.angle.set(-self.pos.vel.x * 0.001)
+
         self.pos.step()
         self.angle.step()
         self.scale.step()

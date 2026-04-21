@@ -4,7 +4,7 @@ from pygame import Vector2, Rect
 
 from core.event_bus import EventBus
 
-from visual.definitions import CARD_SIZE
+from visual.definitions import CARD_SIZE, FPS
 from visual.card_view import CardView
 from visual.board_view import BoardView
 
@@ -14,10 +14,20 @@ class InputSystem:
     def __init__(self, board_view: BoardView, board_player: BoardPlayer):
         self.board_view = board_view
         self.hovered: CardView = None
+        self.dragged: CardView = None
         self.player = board_player
+
+        self.timer = 0
+
+    def step(self):
+        self.timer += 1
     
     def handle_event(self, event) -> None:
         if event.type == pygame.MOUSEMOTION:
+            if self.dragged is not None:
+                self.dragged.set_pos(Vector2(event.pos))
+                return
+
             self.hovered = None
 
             hover_test = self.board_view.hand_row.cards + self.board_view.played_row.cards + self.board_view.joker_row.cards
@@ -33,7 +43,17 @@ class InputSystem:
         
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hovered is not None:
-                print(f"Clicked on card {self.hovered.id}")
+                self.timer = 0
+                self.dragged = self.hovered
+                self.dragged.is_dragged = True
+        
+        elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+            if self.dragged is not None:
+                self.board_view.recalculate_positions()
+                self.dragged.is_dragged = False
+                self.dragged = None
+                self.hovered = None
+            if self.timer < FPS * 0.25 and self.hovered is not None:
                 self.hovered.is_selected = not self.hovered.is_selected
                 self.board_view.recalculate_positions()
 

@@ -10,7 +10,7 @@ from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
 
 from director.director import Director
-from visual.definitions import win_size
+from visual.definitions import win_size, FPS
 
 def initialize_data() -> Director:
     director = Director()
@@ -38,7 +38,6 @@ def main():
 
     # Clock for FPS
     clock = pygame.time.Clock()
-    FPS = 60
 
     director = initialize_data()
     factory = director.get_card_factory()

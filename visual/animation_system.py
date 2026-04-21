@@ -19,8 +19,7 @@ from visual.card_view import CardView
 from visual.view_registry import ViewRegistry
 from visual.board_view import BoardView
 from visual.layout import CardRow
-
-FPS = 60
+from visual.definitions import FPS
 
 DEBUG = False
 

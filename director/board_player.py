@@ -110,7 +110,6 @@ class BoardPlayer:
         for id in selected_cards_ids:
             self.event_bus.add_event(EventDiscardCard(id))
 
-
     def flush_animation(self) -> None:
         self.anim_sys.set_up(self.event_bus)
         self.anim_sys.play()
