@@ -6,8 +6,10 @@ from random import choice
 import pygame
 from pygame import Vector2
 
+from domain.definitions import Enhancement, Seal, Edition
 from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
+import domain.utils as utils
 
 from director.director import Director
 from director.debug_helper import DebugHelper
@@ -56,7 +58,8 @@ def main():
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
                 # DebugHelper().print_hand_cards()
-                player.add_joker(factory.create_joker_card(JokerJimbo))
+                joker_cls = choice(utils.get_all_joker_classes())
+                player.add_joker(factory.create_joker_card(joker_cls))
                 player.flush_animation()
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):

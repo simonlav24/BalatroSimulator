@@ -9,7 +9,7 @@ from core.id_gen import id_type
 from visual.card_view import CardView
 
 def flow(x: float) -> float:
-    return 0.5 * (0.2 * sin(time.perf_counter() * 0.3 + 0.01 * x) + 
+    return 0.2 * (0.2 * sin(time.perf_counter() * 0.3 + 0.01 * x) + 
                   0.05 * cos(-time.perf_counter() * 1.2 + 0.02 * x) +
                   0.05 * sin(time.perf_counter() * 3 + 0.08 * x))
 
@@ -17,10 +17,11 @@ def spread(x: float, l: int) -> float:
     return - 2 * (0.15 / l) * (x - l) - 0.15
 
 class CardRow:
-    def __init__(self, pos, width):
+    def __init__(self, pos, width, spread: bool=False):
         self.pos = pos
         self.width = width
         self.cards: list[CardView] = []
+        self.spread = spread
 
     def add(self, card: CardView, index: int=-1) -> None:
         if index == -1:
@@ -54,7 +55,9 @@ class CardRow:
 
     def step(self) -> None:
         for i, card in enumerate(self.cards):
-            angle = spread(i, len(self.cards))
+            angle = 0
+            if self.spread:
+                angle += spread(i, len(self.cards))
             angle += flow(card.pos().x)
             card.angle.set(angle)
 

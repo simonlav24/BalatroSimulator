@@ -21,7 +21,9 @@ def create_card_surf(data: CardData) -> Surface:
     card_surf = card_surf_at(card_backs_texture, *enhancement_map[data.enhancement])
     # image
     card_surf.blit(rank_suit_at(data.rank, data.suit))
-    # todo: seal
+
+    if data.seal != Seal.NONE:
+        card_surf.blit(card_surf_at(card_backs_texture, *seal_map[data.seal]))
 
     return card_surf
 
@@ -48,7 +50,6 @@ class MotionVector:
         if self.dist_func(self.value, self.value_target) < 0.001:
             self.value = self.value_target
             
-    
     def set(self, value) -> None:
         self.value_target = value
     
@@ -81,8 +82,8 @@ class CardView:
         else:
             self.scale.set(1.0)
         
-        # if abs(self.pos.vel.x) > 100:
-        #     self.angle.set(-self.pos.vel.x * 0.001)
+        if abs(self.pos.vel.x) > 100:
+            self.angle.set(-self.pos.vel.x * 0.001)
 
         self.pos.step()
         self.angle.step()

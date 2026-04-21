@@ -36,42 +36,42 @@ class TestRuns(unittest.TestCase):
             joker(JokerBaron),
         ]
 
-        self.assertEqual(board.play()['score'], 33)
+        self.assertEqual(board.play_test()['score'], 33)
         mime = joker(JokerMime)
         board.jokers.append(mime)
-        self.assertEqual(board.play()['score'], 113)
+        self.assertEqual(board.play_test()['score'], 113)
         another_king = card(suit=Suit.HEARTS, rank=Rank.KING)
         board.hand_cards.append(another_king)
-        self.assertEqual(board.play()['score'], 256)
+        self.assertEqual(board.play_test()['score'], 256)
         another_king.data.seal = Seal.RED
-        self.assertEqual(board.play()['score'], 384)
+        self.assertEqual(board.play_test()['score'], 384)
         another_king.data.enhancement = Enhancement.STEEL
-        self.assertEqual(board.play()['score'], 1297)
+        self.assertEqual(board.play_test()['score'], 1297)
         blueprint = joker(JokerBlueprint)
         board.jokers.insert(0, blueprint)
-        self.assertEqual(board.play()['score'], 49878)
+        self.assertEqual(board.play_test()['score'], 49878)
         board.jokers.remove(blueprint)
         board.jokers.insert(1, blueprint)
-        self.assertEqual(board.play()['score'], 9852)
+        self.assertEqual(board.play_test()['score'], 9852)
         blueprint.data.edition = Edition.POLYCHROME
-        self.assertEqual(board.play()['score'], 14778)
+        self.assertEqual(board.play_test()['score'], 14778)
         mime.data.edition = Edition.POLYCHROME
-        self.assertEqual(board.play()['score'], 22168)
+        self.assertEqual(board.play_test()['score'], 22168)
         brainstorm = joker(JokerBrainstorm)
         board.jokers.append(brainstorm)
-        self.assertEqual(board.play()['score'], 4314398)
+        self.assertEqual(board.play_test()['score'], 4314398)
         board.jokers.remove(blueprint)
         board.jokers.insert(0, blueprint)
-        self.assertEqual(board.play()['score'], 4314398)
+        self.assertEqual(board.play_test()['score'], 4314398)
         board.jokers.remove(brainstorm)
         board.jokers.insert(0, brainstorm)
-        self.assertEqual(board.play()['score'], 112227)
+        self.assertEqual(board.play_test()['score'], 112227)
         board.jokers.remove(brainstorm)
         board.jokers.insert(1, brainstorm)
-        self.assertEqual(board.play()['score'], 2919)
+        self.assertEqual(board.play_test()['score'], 2919)
         board.jokers.remove(blueprint)
         board.jokers.append(blueprint)
-        self.assertEqual(board.play()['score'], 2919)
+        self.assertEqual(board.play_test()['score'], 2919)
 
     def test_golden_vampire(self):
         card = self.factory.card
@@ -97,7 +97,7 @@ class TestRuns(unittest.TestCase):
             joker(JokerVampire)
         ]
 
-        self.assertEqual(board.play()['score'], 416)
+        self.assertEqual(board.play_test()['score'], 416)
     
     def test_photochad(self):
         card = self.factory.card
@@ -123,9 +123,9 @@ class TestRuns(unittest.TestCase):
             joker(JokerHangingChad)
         ]
 
-        self.assertEqual(board.play()['score'], 3200)
+        self.assertEqual(board.play_test()['score'], 3200)
         board.jokers.append(joker(JokerSockAndBuskin))
-        self.assertEqual(board.play()['score'], 8320)
+        self.assertEqual(board.play_test()['score'], 8320)
 
 
     def test_baseball_card(self):
@@ -154,9 +154,9 @@ class TestRuns(unittest.TestCase):
             joker(JokerGiftCard),
         ]
 
-        self.assertEqual(board.play()['score'], 1440)
+        self.assertEqual(board.play_test()['score'], 1440)
         board.jokers.append(joker(JokerSockAndBuskin))
-        self.assertEqual(board.play()['score'], 5940)
+        self.assertEqual(board.play_test()['score'], 5940)
 
     def test_flower_pot(self):
         card = self.factory.card
@@ -173,7 +173,7 @@ class TestRuns(unittest.TestCase):
         board.jokers = [
             joker(JokerFlowerPot),
         ]
-        self.assertEqual(board.play()['score'], 3150)
+        self.assertEqual(board.play_test()['score'], 3150)
 
         board.selected_cards = [
             card(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE),
@@ -182,7 +182,7 @@ class TestRuns(unittest.TestCase):
             card(suit=Suit.HEARTS, rank=Rank.JACK, enhancement=Enhancement.WILD),
             card(suit=Suit.SPADES, rank=Rank.JACK, enhancement=Enhancement.WILD),
             ]
-        self.assertEqual(board.play()['score'], 3150)
+        self.assertEqual(board.play_test()['score'], 3150)
 
         board.selected_cards = [
             card(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE),
@@ -191,7 +191,7 @@ class TestRuns(unittest.TestCase):
             card(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD),
             card(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD),
             ]
-        self.assertEqual(board.play()['score'], 3150)
+        self.assertEqual(board.play_test()['score'], 3150)
 
         board.selected_cards = [
             card(suit=Suit.CLUBS, rank=Rank.JACK, enhancement=Enhancement.STONE),
@@ -200,7 +200,7 @@ class TestRuns(unittest.TestCase):
             card(suit=Suit.DIAMONDS, rank=Rank.JACK, enhancement=Enhancement.WILD),
             card(suit=Suit.SPADES, rank=Rank.JACK),
             ]
-        self.assertEqual(board.play()['score'], 3150)
+        self.assertEqual(board.play_test()['score'], 3150)
 
         board.jokers.append(joker(JokerSmearedJoker))
         board.selected_cards = [
@@ -210,7 +210,7 @@ class TestRuns(unittest.TestCase):
             card(suit=Suit.DIAMONDS, rank=Rank.JACK),
             card(suit=Suit.DIAMONDS, rank=Rank.JACK),
             ]
-        self.assertEqual(board.play()['score'], 3150)
+        self.assertEqual(board.play_test()['score'], 3150)
     
     def test_wee_joker(self):
         card = self.factory.card
@@ -229,4 +229,4 @@ class TestRuns(unittest.TestCase):
             joker(JokerHangingChad),
             joker(JokerHack)
         ]
-        self.assertEqual(board.play()['score'], 84122)
+        self.assertEqual(board.play_test()['score'], 84122)

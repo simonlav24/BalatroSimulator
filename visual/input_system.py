@@ -58,7 +58,7 @@ class InputSystem:
                 self.dragged = None
                 self.board_view.recalculate_positions()
             
-            if self.dragged is not None:
+            elif self.dragged is not None:
                 # drop dragged card
                 self.dragged.is_dragged = False
                 self.dragged = None

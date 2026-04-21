@@ -18,7 +18,7 @@ class BoardView:
         self.view_reg = view_reg
         self.data_reg = data_reg
 
-        self.hand_row = CardRow(Vector2(win_size[0] / 2, 500), 400)
+        self.hand_row = CardRow(Vector2(win_size[0] / 2, 500), 400, spread=True)
         self.played_row = CardRow(Vector2(win_size[0] / 2, 300), 400)
         self.joker_row = CardRow(Vector2(win_size[0] / 2, 100), 400)
 

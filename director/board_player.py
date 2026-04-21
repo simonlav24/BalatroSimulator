@@ -102,6 +102,7 @@ class BoardPlayer:
         for card in [self.data_reg[id] for id in selected_cards_ids]:
             self.board.selected_cards.remove(card)
 
+        self.board.played_cards.clear()
         self.event_bus.add_event(EventClearOut())
 
     def discard(self) -> None:

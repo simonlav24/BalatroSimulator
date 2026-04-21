@@ -18,6 +18,7 @@ class EventTriggerCard:
     chips: float = 0
     mult: float = 0
     time_mult: float = 0
+    custom_text: str = None
 
 @dataclass
 class TriggerEdition:

@@ -48,7 +48,7 @@ class Board:
         if self.evaluation_rules.play_all_cards:
             self.played_cards = self.selected_cards
         
-    def play(self):
+    def play(self) -> dict[str, int | float]:
 
         # start from hand type base level
         chips, mult = get_hand_level_chips_mult(self.current_hand_type, self.levels[self.current_hand_type]['level'])
@@ -101,6 +101,9 @@ class Board:
         print(f'Score: {final_score}')
         return {'score': final_score, 'chips': self.chips, 'mult': self.mult}
 
+    def play_test(self) -> dict[str, int | float]:
+        self.play_initialize()
+        return self.play()
 
     def get_hand_cards(self) -> list[Card]:
         return self.hand_cards
