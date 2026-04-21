@@ -9,6 +9,7 @@ from core.data_registry import DataRegistry
 from visual.definitions import win_size
 from visual.layout import CardRow
 from visual.view_registry import ViewRegistry
+from visual.card_view import CardView
 
 
 
@@ -33,5 +34,30 @@ class BoardView:
             row.step()
             for card in row.cards:
                 card.step()
+    
+    def get_rows(self) -> list[CardRow]:
+        return self.rows[:-1]
 
+    def on_dragging(self, dragged_card: CardView):
+        '''dragging cards, visual reordering only'''
+        row = next((row for row in self.rows if dragged_card in row.cards), None)
+        for card in row.cards:
+            if card == dragged_card:
+                continue
+            # find two cards between which the dragged card is
+            left = next((c for c in reversed(row.cards) if c.pos().x < dragged_card.pos().x), None)
+            right = next((c for c in row.cards if c.pos().x > dragged_card.pos().x), None)
+            if left is not None and right is not None:
+                # insert dragged card between left and right
+                row.cards.remove(dragged_card)
+                row.cards.insert(row.cards.index(right), dragged_card)
+            elif left is not None:
+                # insert dragged card at the end
+                row.cards.remove(dragged_card)
+                row.cards.append(dragged_card)
+            elif right is not None:
+                # insert dragged card at the beginning
+                row.cards.remove(dragged_card)
+                row.cards.insert(0, dragged_card)
+        row.recalc()
         

@@ -13,7 +13,9 @@ from core.event_bus import (
     EventStartPlay,
     EventDrawCard,
     EventDeselect,
+    EventReorderCards,
 )
+from core.data_registry import CardProtocol
 
 from visual.card_view import CardView
 from visual.view_registry import ViewRegistry
@@ -169,6 +171,38 @@ class AnimationSystem:
                 self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index, event.board_area]))
                 self.animation_queue.append(AnimRecalc(self.board_view))
                 self.animation_queue.append(AnimWait(FPS * 0.1))
+            
+            elif isinstance(event, EventReorderCards):
+                def reorder(card_ids, board_area):
+                    area: dict[BoardArea, CardRow] = {
+                        BoardArea.HAND: self.board_view.hand_row,
+                        BoardArea.JOKER: self.board_view.joker_row,
+                    }
+                    id_to_card = {card.id: card for card in area[board_area].cards}
+                    area[board_area].cards[:] = [id_to_card[cid] for cid in card_ids]
+                self.animation_queue.append(AnimFunc(reorder, [event.card_ids, event.board_area]))
+                self.animation_queue.append(AnimRecalc(self.board_view))
     
     def play(self):
         self.state = State.RUNNING
+    
+    def sync_to_view(self, BoardArea) -> None:
+        '''reorder view to match domain order'''
+        mappings: list[tuple[CardRow, list[CardProtocol]]] = [
+            (self.board_view.hand_row, self.board.hand_cards),
+            (self.board_view.played_row, self.board.played_cards),
+            (self.board_view.joker_row, self.board.jokers),
+        ]
+
+        for row, domain_row in mappings:
+            row_ids = [card.id for card in row.cards]
+            domain_ids = [card.id for card in domain_row]
+
+            if row_ids == domain_ids:
+                continue  # already synced
+
+            if set(row_ids) != set(domain_ids):
+                raise ValueError("View/domain mismatch — cannot safely reorder")
+
+            id_to_card = {card.id: card for card in row.cards}
+            row.cards[:] = [id_to_card[cid] for cid in domain_ids]

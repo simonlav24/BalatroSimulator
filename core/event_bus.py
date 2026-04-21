@@ -50,6 +50,11 @@ class EventDrawCard:
     drawn_index: int = -1
     board_area: BoardArea = BoardArea.HAND
 
+@dataclass
+class EventReorderCards:
+    card_ids: list[id_type]
+    board_area: BoardArea
+
 class EventBus:
     def __init__(self):
         self.round_queue = []

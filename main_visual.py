@@ -10,6 +10,7 @@ from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
 
 from director.director import Director
+from director.debug_helper import DebugHelper
 from visual.definitions import win_size, FPS
 
 def initialize_data() -> Director:
@@ -27,6 +28,8 @@ def initialize_data() -> Director:
     player.shuffle()
     player.draw_cards(8)
     player.flush_animation()
+
+    DebugHelper().set_director(director)
 
     return director
 
@@ -52,6 +55,7 @@ def main():
             director.input_system.handle_event(event)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
+                # DebugHelper().print_hand_cards()
                 player.add_joker(factory.create_joker_card(JokerJimbo))
                 player.flush_animation()
 

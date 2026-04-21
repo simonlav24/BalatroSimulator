@@ -7,6 +7,7 @@ from core.event_bus import EventBus
 from visual.definitions import CARD_SIZE, FPS
 from visual.card_view import CardView
 from visual.board_view import BoardView
+from visual.layout import CardRow
 
 from director.board_player import BoardPlayer
 
@@ -26,20 +27,23 @@ class InputSystem:
         if event.type == pygame.MOUSEMOTION:
             if self.dragged is not None:
                 self.dragged.set_pos(Vector2(event.pos))
+                self.board_view.on_dragging(self.dragged)
                 return
 
             self.hovered = None
 
-            hover_test = self.board_view.hand_row.cards + self.board_view.played_row.cards + self.board_view.joker_row.cards
+            hover_test = self.board_view.get_rows()
 
-            for card in reversed(hover_test):
-                rect = Rect(*(card.pos() - CARD_SIZE / 2), *CARD_SIZE)
-                if(rect.collidepoint(event.pos)):
-                    self.hovered = card
-                    break
+            for row in hover_test:
+                for card in reversed(row.cards):
+                    rect = Rect(*(card.pos() - CARD_SIZE / 2), *CARD_SIZE)
+                    if(rect.collidepoint(event.pos)):
+                        self.hovered = card
+                        break
             
-            for card in hover_test:
-                card.is_hovered = self.hovered == card
+            for row in hover_test:
+                for card in row.cards:
+                    card.is_hovered = self.hovered == card
         
         elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             if self.hovered is not None:
@@ -48,14 +52,20 @@ class InputSystem:
                 self.dragged.is_dragged = True
         
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-            if self.dragged is not None:
+            if self.timer < FPS * 0.25 and self.hovered is not None:
+                self.hovered.is_selected = not self.hovered.is_selected
+                self.dragged.is_dragged = False
+                self.dragged = None
                 self.board_view.recalculate_positions()
+            
+            if self.dragged is not None:
+                # drop dragged card
                 self.dragged.is_dragged = False
                 self.dragged = None
                 self.hovered = None
-            if self.timer < FPS * 0.25 and self.hovered is not None:
-                self.hovered.is_selected = not self.hovered.is_selected
+                self.player.sync_to_domain()
                 self.board_view.recalculate_positions()
+
 
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
             self.player.play()

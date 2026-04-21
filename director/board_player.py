@@ -11,6 +11,7 @@ from core.event_bus import (
     EventStartPlay,
     EventSelectCardsForPlay,
     EventDeselect,
+    EventReorderCards,
 )
 from core.data_registry import DataRegistry
 from domain.board import Board
@@ -20,6 +21,7 @@ from domain.joker import Joker
 from visual.board_view import BoardView
 from visual.animation_system import AnimationSystem
 from visual.view_registry import ViewRegistry
+from visual.layout import CardRow
 
 
 class BoardPlayer:
@@ -57,17 +59,23 @@ class BoardPlayer:
             # self.board_view.hand_row.add(self.view_reg[card_id])
         
         self._sort()
+        # self.sync_to_view()
+
         for card in self.board.hand_cards:
             if card.id in drawn_cards_ids:
                 index_in_hand = self.board.hand_cards.index(card)
                 self.event_bus.add_event(EventDrawCard(card.id, index_in_hand))
+        
+        self.event_bus.add_event(EventReorderCards([card.id for card in self.board.hand_cards], BoardArea.HAND))
 
     def add_joker(self, joker: Joker) -> None:
         self.board.jokers.append(joker)
         self.event_bus.add_event(EventDrawCard(joker.id, self.board.jokers.index(joker), BoardArea.JOKER))
 
     def _sort(self) -> None:
+        ''' sort hand cards, Domain only!'''
         self.board.hand_cards.sort(key=lambda x: (x.get_rank().value, x.data.suit.value), reverse=True)
+
 
     def play(self) -> None:
         # gather selected cards
@@ -118,4 +126,23 @@ class BoardPlayer:
     def add_card_to_deck(self, card: Card) -> None:
         self.board.full_deck.append(card)
     
+    def sync_to_domain(self) -> None:
+        '''reorder domain to match view order'''
+        mappings: list[tuple[CardRow, list[Card]]] = [
+            (self.board_view.hand_row, self.board.hand_cards),
+            (self.board_view.played_row, self.board.played_cards),
+            (self.board_view.joker_row, self.board.jokers),
+        ]
 
+        for row, domain_row in mappings:
+            row_ids = [card.id for card in row.cards]
+            domain_ids = [card.id for card in domain_row]
+
+            if row_ids == domain_ids:
+                continue  # already synced
+
+            if set(row_ids) != set(domain_ids):
+                raise ValueError("View/domain mismatch — cannot safely reorder")
+
+            id_to_card = {card.id: card for card in domain_row}
+            domain_row[:] = [id_to_card[cid] for cid in row_ids]

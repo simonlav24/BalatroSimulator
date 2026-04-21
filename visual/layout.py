@@ -40,6 +40,9 @@ class CardRow:
             x = 0
 
         for card in self.cards:
+            if card.is_dragged:
+                x += spacing
+                continue
             pos = self.pos + Vector2(-self.width / 2 + x, 0)
             if card.is_selected:
                 pos[1] -= 30
