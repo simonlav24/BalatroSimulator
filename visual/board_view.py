@@ -1,10 +1,10 @@
 
 
 from typing import Protocol
-from pygame import Vector2
 
 from domain.board import Board
 from core.data_registry import DataRegistry
+from core import Vector2
 
 from visual.definitions import win_size
 from visual.layout import CardRow

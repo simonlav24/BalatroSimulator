@@ -1,7 +1,7 @@
 
 import pygame
-from pygame import Vector2, Rect
 
+from core import Vector2, Rect
 from core.event_bus import EventBus
 
 from visual.definitions import CARD_SIZE, FPS

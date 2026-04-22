@@ -1,6 +1,6 @@
 
 import pygame
-from pygame import Vector2
+from core import Vector2
 
 from domain.definitions import Suit, Rank, Enhancement, Seal
 

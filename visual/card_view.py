@@ -1,34 +1,15 @@
 
 
 from random import randint, choice, uniform
-from enum import Enum
-from math import atan, radians, degrees
+from pygame import Surface
 
+from core import Vector2
 from core.id_gen import id_type
 from visual.definitions import *
-from domain.card import CardData
-
-import pygame
-from pygame import Surface, Vector2, Rect
 
 SPRING_FORCE = 80.0
 SPRING_DAMP = 10.0
 TIME_SCALE = 0.03
-
-
-def create_card_surf(data: CardData) -> Surface:
-    # back
-    card_surf = card_surf_at(card_backs_texture, *enhancement_map[data.enhancement])
-    # image
-    card_surf.blit(rank_suit_at(data.rank, data.suit))
-
-    if data.seal != Seal.NONE:
-        card_surf.blit(card_surf_at(card_backs_texture, *seal_map[data.seal]))
-
-    return card_surf
-
-def create_joker_surf(name: str) -> Surface:
-    return card_surf_at(jokers_texture, *jokers_map[name])
 
 
 class MotionVector:
@@ -88,18 +69,7 @@ class CardView:
         self.pos.step()
         self.angle.step()
         self.scale.step()
-
-    def draw(self, surf: pygame.Surface) -> None:
-        transformed = pygame.transform.rotozoom(self.surf, degrees(self.angle()), self.scale())
-        surf.blit(transformed, self.pos() - Vector2(transformed.get_size()) / 2)
     
     def nudge(self, factor: float=1.0) -> None:
         self.angle.nudge(uniform(7 * factor, -7 * factor))
         self.scale.nudge(5 * factor)
-
-
-def create_card_view(card: CardData, id: id_type) -> CardView:
-    surf = create_card_surf(card)
-    view = CardView(id, surf)
-    return view
-

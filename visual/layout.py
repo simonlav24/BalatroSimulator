@@ -2,9 +2,7 @@
 from math import cos, sin
 import time
 
-import pygame
-from pygame import Vector2, Surface
-
+from core import Vector2
 from core.id_gen import id_type
 from visual.card_view import CardView
 
@@ -60,7 +58,3 @@ class CardRow:
                 angle += spread(i, len(self.cards))
             angle += flow(card.pos().x)
             card.angle.set(angle)
-
-    def draw(self, win: Surface) -> None:
-        pygame.draw.circle(win, (255,0,0), self.pos, 2)
-        pygame.draw.line(win, (255,0,0), self.pos - Vector2(self.width / 2, 0), self.pos + Vector2(self.width / 2, 0))

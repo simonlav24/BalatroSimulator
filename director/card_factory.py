@@ -7,7 +7,8 @@ from core.event_bus import EventBus
 from core.data_registry import DataRegistry
 
 from visual.view_registry import ViewRegistry
-from visual.card_view import CardView, create_card_surf, create_joker_surf
+from visual.card_view import CardView
+from visual.renderer import create_card_surf, create_joker_surf
 
 class CardFactory:
     def __init__(self, data_registry: DataRegistry, event_bus: EventBus, view_registry: ViewRegistry):
