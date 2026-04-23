@@ -12,6 +12,11 @@ from core.event_bus import (
     EventSelectCardsForPlay,
     EventDeselect,
     EventReorderCards,
+    GameEventPlay,
+    GameEventDiscard,
+    GameEventChangedOrder,
+    GameEventChagnedSelection,
+    GameEventUpdateScore,
 )
 from core.data_registry import DataRegistry
 from domain.board import Board
@@ -22,7 +27,6 @@ from visual.board_view import BoardView
 from visual.animation_system import AnimationSystem
 from visual.view_registry import ViewRegistry
 from visual.layout import CardRow
-
 
 class BoardPlayer:
     def __init__(self, board: Board, board_view: BoardView, event_bus: EventBus, anim_sys: AnimationSystem, data_reg: DataRegistry, view_reg: ViewRegistry):
@@ -41,6 +45,31 @@ class BoardPlayer:
 
     def shuffle(self) -> None:
         shuffle(self.board.remaining_deck)
+
+    def handle_game_event(self, event) -> None:
+        if isinstance(event, GameEventPlay):
+            self.play()
+            self.draw_cards()
+            self.flush_animation()
+            event.is_handled = True
+        
+        elif isinstance(event, GameEventDiscard):
+            self.discard()
+            self.draw_cards()
+            self.flush_animation()
+            event.is_handled = True
+        
+        elif isinstance(event, GameEventChangedOrder):
+            self.sync_to_domain()
+            print('synced to domain')
+            self.board_view.recalculate_positions()
+            event.is_handled = True
+        
+        elif isinstance(event, GameEventChagnedSelection):
+            chips, mult = self.board.get_initial_score([self.data_reg[card.id] for card in self.board_view.hand_row.cards if card.is_selected])
+            self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True))
+            event.is_handled = True
+            
 
     def draw_cards(self, amount: int=-1) -> None:
         if amount == -1:

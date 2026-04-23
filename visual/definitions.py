@@ -1,17 +1,34 @@
 
+
 import pygame
 from core import Vector2
 
 from domain.definitions import Suit, Rank, Enhancement, Seal
 
 
-cards_texture_path = f'assets/playing_cards.png'
-card_backs_texture_path = f'assets/card_backs.png'
-jokers_texture_path = f'assets/jokers.png'
+cards_texture_path = r'assets/playing_cards.png'
+card_backs_texture_path = r'assets/card_backs.png'
+jokers_texture_path = r'assets/jokers.png'
+
+font_path = r'assets/m6x11.ttf'
 
 cards_texture = pygame.image.load(cards_texture_path)
 card_backs_texture = pygame.image.load(card_backs_texture_path)
 jokers_texture = pygame.image.load(jokers_texture_path)
+
+
+class Fonts:
+    def __init__(self):
+        self.small = pygame.font.Font(font_path, 24)
+        self.medium = pygame.font.Font(font_path, 40)
+        self.large = pygame.font.Font(font_path, 56)
+
+fonts: Fonts | None = None
+
+def init():
+    global fonts
+    fonts = Fonts()
+
 
 win_size = Vector2(1280, 720)
 CARD_SIZE = Vector2(71, 95)
@@ -205,3 +222,12 @@ jokers_map = {
     "Zany Joker": (3, 0),
     "Spare Trousers": (4, 15)
 }
+
+class UIRatios:
+    PLAY_BUTTON_SIZE = win_size.elementwise() * Vector2(0.1, 0.1)
+    PLAY_BUTTON_OFFSET_1 = win_size.elementwise() * Vector2(0.37, 0.83)
+    PLAY_BUTTON_OFFSET_2 = win_size.elementwise() * Vector2(0.6, 0.83)
+
+class Colors:
+    BLUE = (0, 147, 254)
+    RED = (254, 76, 64)

@@ -1,8 +1,5 @@
 
 
-from dataclasses import dataclass
-
-from core.event_bus import EventBus, EventSelectCardsForPlay, EventStartPlay
 
 from domain.card import Card
 from domain.joker import Joker
@@ -100,6 +97,13 @@ class Board:
         print(f'Chips: {self.chips}, Mult: {self.mult}')
         print(f'Score: {final_score}')
         return {'score': final_score, 'chips': self.chips, 'mult': self.mult}
+
+    def get_initial_score(self, cards: list[Card]) -> tuple[int, float]:
+        if len(cards) == 0:
+            return 0, 0.0
+        hand_type, _ = asses_poker_hand(cards, self.evaluation_rules)
+        chips, mult = get_hand_level_chips_mult(hand_type, self.levels[self.current_hand_type]['level'])
+        return chips, mult
 
     def play_test(self) -> dict[str, int | float]:
         self.play_initialize()

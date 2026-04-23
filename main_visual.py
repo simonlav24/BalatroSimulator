@@ -10,9 +10,10 @@ from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
 import domain.utils as utils
 
+from visual.definitions import win_size, FPS
+from visual import definitions
 from director.director import Director
 from director.debug_helper import DebugHelper
-from visual.definitions import win_size, FPS
 
 def initialize_data() -> Director:
     director = Director()
@@ -36,6 +37,7 @@ def initialize_data() -> Director:
 
 def main():
     pygame.init()
+    definitions.init()
 
     win = pygame.display.set_mode(win_size)
     pygame.display.set_caption("Balatro Simulator")
@@ -47,6 +49,8 @@ def main():
     factory = director.get_card_factory()
     player = director.get_player()
 
+    ui = director.initialize_round_ui()
+
     # Main loop
     done = False
     while not done:
@@ -56,10 +60,10 @@ def main():
             director.input_system.handle_event(event)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
-                # DebugHelper().print_hand_cards()
-                joker_cls = choice(utils.get_all_joker_classes())
-                player.add_joker(factory.create_joker_card(joker_cls))
-                player.flush_animation()
+                DebugHelper().print_hand_cards()
+                # joker_cls = choice(utils.get_all_joker_classes())
+                # player.add_joker(factory.create_joker_card(joker_cls))
+                # player.flush_animation()
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True
@@ -70,7 +74,9 @@ def main():
         # draw
         win.fill((0, 0, 0))
         
+        ui.draw(win)
         director.renderer.draw(win)
+
 
         # Update display
         pygame.display.flip()
