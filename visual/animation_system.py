@@ -70,7 +70,7 @@ class AnimWait(Animation):
     
     def step(self):
         self.time -= 1
-        if self.time == 0:
+        if self.time <= 0:
             self.is_done = True
 
 
@@ -127,7 +127,10 @@ class AnimationSystem:
                 self.animation_queue.pop(0)
 
     def set_up(self, event_bus: EventBus):
+
+        time_skew = 1.0
         for event in event_bus.get_round_queue():
+
             if isinstance(event, EventStartPlay):
                 # remove from row and add to play area
                 for card in [self.view_reg[id] for id in event.card_ids]:
@@ -140,7 +143,9 @@ class AnimationSystem:
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
                 self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
                 if event.halt:
-                    self.animation_queue.append(AnimWait(FPS * 0.5))
+                    wait_time = max(5.0, FPS * 0.5 * time_skew)
+                    time_skew *= 0.95
+                    self.animation_queue.append(AnimWait(wait_time))
             
             elif isinstance(event, EventSelectCardsForPlay):
                 # select playable cards
