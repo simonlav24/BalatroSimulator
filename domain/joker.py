@@ -67,8 +67,8 @@ class Joker:
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return 0
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
-        return 0
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, 'Joker']:
+        return 0, None
     
     def trigger_on_end_round(self, board: BoardVision) -> None:
         ...
@@ -98,6 +98,12 @@ class Joker:
         sell_cost = floor(buy_cost / 2)
         return sell_cost
 
+    def retrigger_effect(self) -> None:
+        ...
+
+    def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
+        return False
+
 
 class JokerCopier(Joker):
     def __init__(self, name: str, event_bus: EventBus):
@@ -124,5 +130,5 @@ class JokerCopier(Joker):
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return self.copied_joker.get_card_retriggers(card, board)
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, Joker]:
         return self.copied_joker.get_hand_card_retriggers(card, board)

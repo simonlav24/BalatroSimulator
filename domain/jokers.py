@@ -253,15 +253,18 @@ class JokerFourFingers(Joker):
     def change_evaluation_rules(self, board: BoardVision):
         board.get_evaluation_rules().fingers = 4
 
-# todo:
+
 class JokerMime(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Mime', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
-        return 1
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, Joker]:
+        return 1, self
+    
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 
 class JokerCreditCard(Joker):
@@ -900,9 +903,13 @@ class JokerBaron(Joker):
         if card.get_rank() == Rank.KING:
             board.add_time_mult(1.5)
             logger.info(f'{self.data.name} added 1.5 time-mult')
-            self.event_bus.add_event(EventTriggerCard(self.id))
+            self.event_bus.add_event(EventTriggerCard(self.id, halt=False))
             self.event_bus.add_event(EventTriggerCard(card.id, time_mult=1.5))
         super().trigger_on_card_in_hand(card, board)
+    
+    def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
+        if card.get_rank() == Rank.KING:
+            return True
 
 
 class JokerCloud9(Joker):
@@ -1008,6 +1015,9 @@ class JokerReservedParking(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Reserved Parking', event_bus=event_bus)
         self.data.cost = 6
+    
+    def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
+        return board.get_evaluation_rules().is_face_card(card)
 
 
 class JokerMailInRebate(Joker):
@@ -1786,8 +1796,13 @@ class JokerShootTheMoon(Joker):
         if card.get_rank() == Rank.QUEEN:
             board.add_mult(13)
             logger.info(f'{self.data.name} added 13 mult')
-            self.event_bus.add_event(EventTriggerCard(self.id, mult=13))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=13, halt=False))
+            self.event_bus.add_event(EventTriggerCard(card.id))
         super().trigger_on_card_in_hand(card, board)
+    
+    def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
+        if card.get_rank() == Rank.QUEEN:
+            return True
 
 
 class JokerDriversLicense(Joker):

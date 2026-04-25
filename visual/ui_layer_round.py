@@ -3,7 +3,7 @@ from math import degrees
 from typing import TYPE_CHECKING, Any
 from pygame import Surface
 
-from core.event_bus import EventBus, GameEventDiscard, GameEventPlay, GameEventUpdateScore, GameEventEndHand
+from core.event_bus import EventBus, GameEventDiscard, GameEventPlay, GameEventUpdateScore, GameEventEndHand, GameEventEndRound
 from visual.definitions import win_size, FPS, UIRatios, Colors
 from visual.ui import Button, Text
 
@@ -52,7 +52,7 @@ class UILayerRound:
                 self.chips_text.angle.nudge(degrees(10))
                 self.chips_text.scale.nudge(20)
             
-            self.mult_text.update(str(self.mult))
+            self.mult_text.update(str(int(self.mult)))
             if nudge_mult:
                 self.mult_text.angle.nudge(degrees(10))
                 self.mult_text.scale.nudge(20)
@@ -67,7 +67,12 @@ class UILayerRound:
         
         elif isinstance(event, GameEventEndHand):
             self.round_score += self.chips * self.mult
-            self.round_score_text.update(str(self.round_score))
+            self.round_score_text.update(str(int(self.round_score)))
+            event.is_handled = True
+        
+        elif isinstance(event, GameEventEndRound):
+            self.round_score = 0
+            self.round_score_text.update(str(int(self.round_score)))
             event.is_handled = True
 
 

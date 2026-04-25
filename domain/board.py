@@ -70,11 +70,16 @@ class Board:
 
         # trigger cards in hands
         for card in self.hand_cards:
+            if not self.card_has_effect_in_hand(card):
+                continue
+            
             # calculate card triggers
-            card_triggers = self.evaluate_card_triggers_in_hand(card)
+            card_triggers, joker_list = self.evaluate_card_triggers_in_hand(card)
 
-            for _ in range(card_triggers):
+            for i in range(card_triggers):
                 # trigger card
+                if joker_list[i]:
+                    joker_list[i].retrigger_effect()
                 card.trigger_in_hand_on_hand_end(self)
 
                 # trigger jokers on hand card
@@ -149,14 +154,20 @@ class Board:
             triggers += joker.get_card_retriggers(card, self)
         return triggers
     
-    def evaluate_card_triggers_in_hand(self, card: Card) -> int:
+    def evaluate_card_triggers_in_hand(self, card: Card) -> tuple[int, list[Joker]]:
         # debuffed might go here
         triggers = 1
+        jokers = [None]
         if card.data.seal == Seal.RED:
             triggers += 1
+            jokers.append(None)
         for joker in self.jokers:
-            triggers += joker.get_hand_card_retriggers(card, self)
-        return triggers
+            amount, joker = joker.get_hand_card_retriggers(card, self)
+            if amount > 0:
+                triggers += amount
+                for _ in range(amount):
+                    jokers.append(joker)
+        return triggers, jokers
 
     def get_full_deck(self) -> list[Card]:
         return self.full_deck
@@ -166,4 +177,8 @@ class Board:
 
     def get_current_hand_type(self) -> HandType:
         return self.current_hand_type
-    
+
+    def card_has_effect_in_hand(self, card: Card) -> bool:
+        if card.data.enhancement == Enhancement.STEEL:
+            return True
+        return any(joker.card_has_effect_in_hand(card, self) for joker in self.jokers)

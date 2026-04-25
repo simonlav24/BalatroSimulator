@@ -7,7 +7,8 @@ import pygame
 
 from domain.definitions import Enhancement, Seal, Edition
 from domain.card import create_standard_deck
-from domain.jokers import JokerJimbo
+from domain.jokers import *
+from domain.utils import get_all_joker_classes
 
 from visual.definitions import win_size, FPS
 from visual import definitions
@@ -21,9 +22,11 @@ def initialize_data() -> Director:
 
     deck = create_standard_deck()
     for card in deck:
-        new_card = factory.create_playing_card(card.rank, card.suit)
+        new_card = factory.create_playing_card(card.rank, card.suit, Enhancement.STEEL, seal=Seal.RED)
         player.add_card_to_deck(new_card)
     player.add_joker(factory.create_joker_card(JokerJimbo))
+    player.add_joker(factory.create_joker_card(JokerBaron))
+    player.add_joker(factory.create_joker_card(JokerMime))
 
     player.reset()
     player.shuffle()
@@ -59,10 +62,10 @@ def main():
             director.input_system.handle_event(event)
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_t:
-                DebugHelper().print_hand_cards()
-                # joker_cls = choice(utils.get_all_joker_classes())
-                # player.add_joker(factory.create_joker_card(joker_cls))
-                # player.flush_animation()
+                # DebugHelper().print_hand_cards()
+                joker_cls = choice(get_all_joker_classes())
+                player.add_joker(factory.create_joker_card(joker_cls))
+                player.flush_animation()
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True

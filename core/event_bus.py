@@ -24,6 +24,7 @@ class EventTriggerCard:
     mult: float = 0.0
     time_mult: float = 1.0
     custom_text: str = None
+    halt: bool = True
 
 @dataclass
 class TriggerEdition:
@@ -84,6 +85,10 @@ class GameEventChagnedSelection:
 
 @dataclass
 class GameEventEndHand:
+    is_handled: bool = False
+
+@dataclass
+class GameEventEndRound:
     is_handled: bool = False
 
 @dataclass

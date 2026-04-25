@@ -139,7 +139,8 @@ class AnimationSystem:
             elif isinstance(event, EventTriggerCard):
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
                 self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
-                self.animation_queue.append(AnimWait(FPS * 0.5))
+                if event.halt:
+                    self.animation_queue.append(AnimWait(FPS * 0.5))
             
             elif isinstance(event, EventSelectCardsForPlay):
                 # select playable cards

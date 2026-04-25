@@ -3,7 +3,7 @@ from typing import Protocol, Any
 import pygame
 
 from core import Vector2, Rect
-from core.event_bus import EventBus, GameEventPlay, GameEventDiscard, GameEventChangedOrder, GameEventChagnedSelection
+from core.event_bus import EventBus, GameEventPlay, GameEventDiscard, GameEventChangedOrder, GameEventChagnedSelection, GameEventEndRound
 
 from visual.definitions import CARD_SIZE, FPS
 from visual.card_view import CardView
@@ -105,6 +105,9 @@ class InputSystem:
         
         elif event.type == pygame.KEYDOWN and event.key == pygame.K_BACKSPACE:
             self.event_bus.add_game_event(GameEventDiscard())
+        
+        elif event.type == pygame.KEYDOWN and event.key == pygame.K_r:
+            self.event_bus.add_game_event(GameEventEndRound())
 
         elif event.type == pygame.USEREVENT:
             ...
