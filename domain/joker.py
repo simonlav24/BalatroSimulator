@@ -67,8 +67,8 @@ class Joker:
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return 0
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, 'Joker']:
-        return 0, None
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
+        return 0
     
     def trigger_on_end_round(self, board: BoardVision) -> None:
         ...
@@ -130,5 +130,5 @@ class JokerCopier(Joker):
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return self.copied_joker.get_card_retriggers(card, board)
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, Joker]:
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return self.copied_joker.get_hand_card_retriggers(card, board)

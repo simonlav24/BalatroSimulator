@@ -260,8 +260,8 @@ class JokerMime(Joker):
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
     
-    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> tuple[int, Joker]:
-        return 1, self
+    def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
+        return 1
     
     def retrigger_effect(self):
         self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
@@ -372,6 +372,9 @@ class JokerDusk(Joker):
         if board.get_data().remaining_hands == 0:
             return 1
         return 0
+    
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 
 class JokerRaisedFist(Joker):
@@ -466,6 +469,9 @@ class JokerHack(Joker):
         if card.get_rank() in [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE]:
             return 1
         return 0
+    
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 
 class JokerPareidolia(Joker):
@@ -1259,6 +1265,9 @@ class JokerSeltzer(Joker):
 
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return 1
+    
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 
 class JokerCastle(Joker):
@@ -1355,6 +1364,9 @@ class JokerSockAndBuskin(Joker):
         if board.get_evaluation_rules().is_face_card(card):
             return 1
         return 0
+    
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 
 class JokerSwashbuckler(Joker):
@@ -1418,6 +1430,8 @@ class JokerHangingChad(Joker):
             return 2
         return 0
 
+    def retrigger_effect(self):
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
 
 class JokerRoughGem(Joker):
     def __init__(self, event_bus: EventBus):

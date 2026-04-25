@@ -58,10 +58,12 @@ class Board:
 
         for card in self.played_cards:
             # calculate card triggers
-            card_triggers = self.evaluate_card_triggers_played(card)
+            card_triggers, joker_list = self.evaluate_card_triggers_played(card)
 
-            for _ in range(card_triggers):
+            for i in range(card_triggers):
                 # trigger card
+                if joker_list[i]:
+                    joker_list[i].retrigger_effect()
                 card.trigger_on_play(self)
 
                 # trigger jokers on play card
@@ -72,7 +74,7 @@ class Board:
         for card in self.hand_cards:
             if not self.card_has_effect_in_hand(card):
                 continue
-            
+
             # calculate card triggers
             card_triggers, joker_list = self.evaluate_card_triggers_in_hand(card)
 
@@ -145,14 +147,20 @@ class Board:
     def get_selected_cards(self) -> list[Card]:
         return self.selected_cards
 
-    def evaluate_card_triggers_played(self, card: Card) -> int:
+    def evaluate_card_triggers_played(self, card: Card) -> tuple[int, list[Joker]]:
         # debuffed might go here
         triggers = 1
+        jokers = [None]
         if card.data.seal == Seal.RED:
             triggers += 1
+            jokers.append(None)
         for joker in self.jokers:
-            triggers += joker.get_card_retriggers(card, self)
-        return triggers
+            amount = joker.get_card_retriggers(card, self)
+            if amount > 0:
+                triggers += amount
+                for _ in range(amount):
+                    jokers.append(joker)
+        return triggers, jokers
     
     def evaluate_card_triggers_in_hand(self, card: Card) -> tuple[int, list[Joker]]:
         # debuffed might go here
@@ -162,7 +170,7 @@ class Board:
             triggers += 1
             jokers.append(None)
         for joker in self.jokers:
-            amount, joker = joker.get_hand_card_retriggers(card, self)
+            amount = joker.get_hand_card_retriggers(card, self)
             if amount > 0:
                 triggers += amount
                 for _ in range(amount):

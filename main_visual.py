@@ -27,6 +27,7 @@ def initialize_data() -> Director:
     player.add_joker(factory.create_joker_card(JokerJimbo))
     player.add_joker(factory.create_joker_card(JokerBaron))
     player.add_joker(factory.create_joker_card(JokerMime))
+    player.add_joker(factory.create_joker_card(JokerSockAndBuskin))
 
     player.reset()
     player.shuffle()
