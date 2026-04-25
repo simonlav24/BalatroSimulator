@@ -15,6 +15,7 @@ from core.event_bus import (
     EventDeselect,
     EventReorderCards,
     GameEventUpdateScore,
+    GameEventEndHand,
 )
 from core.data_registry import CardProtocol
 
@@ -48,17 +49,6 @@ class AnimCardNudge(Animation):
     def step(self):
         self.card.nudge()
         if DEBUG: print('nudgin card')
-        self.is_done = True
-
-
-class AnimScoreChange(Animation):
-    def __init__(self, event_bus: EventBus, chips: int, mult: float, time_mult: float):
-        super().__init__()
-        self.event_bus = event_bus
-        self.event = GameEventUpdateScore(chips, mult, time_mult)
-    
-    def step(self):
-        self.event_bus.add_game_event(self.event)
         self.is_done = True
 
 
@@ -106,6 +96,17 @@ class AnimRecalc(Animation):
         self.is_done = True
 
 
+class AnimEventTrigger(Animation):
+    def __init__(self, event_bus: EventBus, event: Any):
+        super().__init__()
+        self.event = event
+        self.event_bus = event_bus
+    
+    def step(self):
+        self.event_bus.add_game_event(self.event)
+        self.is_done = True
+
+
 class AnimationSystem:
     def __init__(self, view_reg: ViewRegistry, board_view: BoardView):
         self.view_reg = view_reg
@@ -137,7 +138,7 @@ class AnimationSystem:
 
             elif isinstance(event, EventTriggerCard):
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
-                self.animation_queue.append(AnimScoreChange(event_bus, event.chips, event.mult, event.time_mult))
+                self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
                 self.animation_queue.append(AnimWait(FPS * 0.5))
             
             elif isinstance(event, EventSelectCardsForPlay):
@@ -152,6 +153,7 @@ class AnimationSystem:
                 for card in [self.view_reg[id] for id in event.card_ids]:
                     self.animation_queue.append(AnimCardSelect(card))
                 self.animation_queue.append(AnimRecalc(self.board_view))
+                self.animation_queue.append(AnimEventTrigger(event_bus, GameEventEndHand()))
                 self.animation_queue.append(AnimWait(FPS * 1))
             
             elif isinstance(event, EventClearOut):

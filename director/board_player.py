@@ -66,8 +66,8 @@ class BoardPlayer:
             event.is_handled = True
         
         elif isinstance(event, GameEventChagnedSelection):
-            chips, mult = self.board.get_initial_score([self.data_reg[card.id] for card in self.board_view.hand_row.cards if card.is_selected])
-            self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True))
+            hand_info, chips, mult = self.board.get_initial_score([self.data_reg[card.id] for card in self.board_view.hand_row.cards if card.is_selected])
+            self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True, hand_info=hand_info))
             event.is_handled = True
             
 

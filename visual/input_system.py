@@ -17,7 +17,7 @@ class UIElement(Protocol):
         self.rect: Rect = None
         self.event: Any = None
     
-    def on_click(self): ...
+    def step(self) -> None: ...
 
 
 class InputSystem:
@@ -33,6 +33,8 @@ class InputSystem:
 
     def step(self):
         self.timer += 1
+        for element in self.elements:
+            element.step()
     
     def register_ui_element(self, ui_element: UIElement) -> None:
         self.elements.append(ui_element)
@@ -78,13 +80,12 @@ class InputSystem:
         elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
             if self.hovered_element is not None:
                 self.hovered_element.is_pressed = False
-                self.hovered_element.on_click()
                 if self.hovered_element.event is not None:
                     self.event_bus.add_game_event(self.hovered_element.event)
             for element in self.elements:
                 element.is_pressed = False
 
-            if self.timer < FPS * 0.25 and self.hovered_card is not None:
+            if self.timer < FPS * 0.2 and self.hovered_card is not None:
                 self.hovered_card.is_selected = not self.hovered_card.is_selected
                 self.dragged.is_dragged = False
                 self.dragged = None

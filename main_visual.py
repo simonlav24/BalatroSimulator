@@ -8,7 +8,6 @@ import pygame
 from domain.definitions import Enhancement, Seal, Edition
 from domain.card import create_standard_deck
 from domain.jokers import JokerJimbo
-import domain.utils as utils
 
 from visual.definitions import win_size, FPS
 from visual import definitions

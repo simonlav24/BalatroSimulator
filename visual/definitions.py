@@ -229,5 +229,6 @@ class UIRatios:
     PLAY_BUTTON_OFFSET_2 = win_size.elementwise() * Vector2(0.6, 0.83)
 
 class Colors:
+    WHITE = (255, 255, 255)
     BLUE = (0, 147, 254)
     RED = (254, 76, 64)

@@ -83,13 +83,17 @@ class GameEventChagnedSelection:
     is_handled: bool = False
 
 @dataclass
+class GameEventEndHand:
+    is_handled: bool = False
+
+@dataclass
 class GameEventUpdateScore:
     chips: int = 0
     mult: float = 0.0
     time_mult: float = 1.0
     absolute: bool = False
+    hand_info: tuple[str, int] = (None, None)
     is_handled: bool = False
-
 
 
 
