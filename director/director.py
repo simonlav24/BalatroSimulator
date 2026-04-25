@@ -31,7 +31,7 @@ class Director:
         self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system, self.data_registry, self.view_registry)
         self.input_system = InputSystem(self.board_view, self.event_bus)
     
-        self.renderer = Renderer(self.board_view, self.view_registry, self.input_system)
+        self.renderer = Renderer(self.board_view, self.view_registry, self.input_system, self.animation_system)
         self.ui_layer = None
         
     def get_card_factory(self) -> CardFactory:

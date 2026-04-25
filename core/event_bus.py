@@ -25,6 +25,7 @@ class EventTriggerCard:
     time_mult: float = 1.0
     custom_text: str = None
     halt: bool = True
+    is_joker: bool = True
 
 @dataclass
 class TriggerEdition:

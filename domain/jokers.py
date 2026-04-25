@@ -910,7 +910,7 @@ class JokerBaron(Joker):
             board.add_time_mult(1.5)
             logger.info(f'{self.data.name} added 1.5 time-mult')
             self.event_bus.add_event(EventTriggerCard(self.id, halt=False))
-            self.event_bus.add_event(EventTriggerCard(card.id, time_mult=1.5))
+            self.event_bus.add_event(EventTriggerCard(card.id, time_mult=1.5, is_joker=False))
         super().trigger_on_card_in_hand(card, board)
     
     def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:

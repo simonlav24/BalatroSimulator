@@ -80,7 +80,7 @@ class Card:
             chips = self.get_value()
         
         board.add_chips(chips)
-        self.event_bus.add_event(EventTriggerCard(self.id, chips=chips))
+        self.event_bus.add_event(EventTriggerCard(self.id, chips=chips, is_joker=False))
 
         # mult
         mult = 0
@@ -96,11 +96,11 @@ class Card:
         
         if mult > 0:
             board.add_mult(mult)
-            self.event_bus.add_event(EventTriggerCard(self.id, mult=mult))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=mult, is_joker=False))
 
         if self.data.enhancement == Enhancement.GLASS:
             board.add_time_mult(2)
-            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=2))
+            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=2, is_joker=False))
         
 
         # editions
@@ -120,7 +120,7 @@ class Card:
     def trigger_in_hand_on_hand_end(self, board: BoardVision) -> None:
         if self.data.enhancement == Enhancement.STEEL:
             board.add_time_mult(1.5)
-            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=1.5))
+            self.event_bus.add_event(EventTriggerCard(self.id, time_mult=1.5, is_joker=False))
 
 
 def create_standard_deck() -> list[CardData]:

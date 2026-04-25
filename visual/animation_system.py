@@ -24,13 +24,14 @@ from visual.view_registry import ViewRegistry
 from visual.board_view import BoardView
 from visual.layout import CardRow
 from visual.definitions import FPS
+from visual.effects import TriggerEffect, create_trigger_effect
 
 DEBUG = False
+
 
 class State(Enum):
     IDLE = 0
     RUNNING = 1
-
 
 
 class Animation:
@@ -114,6 +115,8 @@ class AnimationSystem:
         self.animation_queue: list[Animation] = []
         self.state = State.IDLE
 
+        self.effects: list[TriggerEffect] = []
+
     def step(self):
         if self.state == State.IDLE:
             ...
@@ -125,6 +128,10 @@ class AnimationSystem:
             self.animation_queue[0].step()
             if self.animation_queue[0].is_done:
                 self.animation_queue.pop(0)
+        
+        for effect in self.effects:
+            effect.step()
+        self.effects = [effect for effect in self.effects if not effect.is_done]
 
     def set_up(self, event_bus: EventBus):
 
@@ -142,6 +149,11 @@ class AnimationSystem:
             elif isinstance(event, EventTriggerCard):
                 self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
                 self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
+                def add_effect(animation_sys: AnimationSystem, effect: TriggerEffect):
+                    animation_sys.effects.append(effect)
+                effect = create_trigger_effect(event, self.view_reg, time_skew)
+                if effect:
+                    self.animation_queue.append(AnimFunc(add_effect, [self, effect]))
                 if event.halt:
                     wait_time = max(5.0, FPS * 0.5 * time_skew)
                     time_skew *= 0.95
@@ -227,3 +239,7 @@ class AnimationSystem:
 
             id_to_card = {card.id: card for card in row.cards}
             row.cards[:] = [id_to_card[cid] for cid in domain_ids]
+    
+    def draw(self, win) -> None:
+        for effect in self.effects:
+            effect.draw(win)

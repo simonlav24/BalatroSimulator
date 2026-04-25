@@ -10,6 +10,7 @@ from visual.view_registry import ViewRegistry
 from visual.input_system import InputSystem
 from visual.card_view import CardView
 from visual.layout import CardRow
+from visual.animation_system import AnimationSystem
 
 
 def create_card_surf(data: CardData) -> Surface:
@@ -38,10 +39,11 @@ def draw_row_debug(row: CardRow, surf: Surface) -> None:
 
 
 class Renderer:
-    def __init__(self, board: BoardView, view_reg: ViewRegistry, input_system: InputSystem):
+    def __init__(self, board: BoardView, view_reg: ViewRegistry, input_system: InputSystem, anim_sys: AnimationSystem):
         self.board = board
         self.view_reg = view_reg
         self.input_system = input_system
+        self.anim_sys = anim_sys
 
     def draw(self, win: Surface) -> None:
         for row in self.board.rows:
@@ -51,3 +53,5 @@ class Renderer:
         
         if self.input_system.dragged is not None:
             draw_card(self.input_system.dragged, win)
+        
+        self.anim_sys.draw(win)
