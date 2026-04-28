@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Any
 
 from core.id_gen import id_type
-from domain.definitions import Edition, CardType
+from domain.definitions import Edition, CardType, Enhancement
 
 class BoardArea(Enum):
     HAND = 0
@@ -47,6 +47,11 @@ class EventStartPlay:
 @dataclass
 class EventClearOut:
     ...
+
+@dataclass
+class EventChangeEnhancement:
+    id: int
+    enhancement: Enhancement
 
 @dataclass
 class EventDiscardCard:

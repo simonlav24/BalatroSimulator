@@ -12,6 +12,7 @@ from visual.input_system import InputSystem
 from visual.animation_system import AnimationSystem
 from visual.effect_system import EffectSystem
 from visual.board_view import BoardView
+from visual.texturizer import CardTexturizer
 from visual.ui_layer_round import UILayerRound
 
 from director.board_player import BoardPlayer
@@ -28,8 +29,9 @@ class Director:
 
         self.board_view = BoardView(self.view_registry, self.data_registry)
 
+        self.texturizer = CardTexturizer(self.data_registry, self.view_registry)
         self.effect_system = EffectSystem()
-        self.animation_system = AnimationSystem(self.view_registry, self.board_view, self.effect_system)
+        self.animation_system = AnimationSystem(self.view_registry, self.board_view, self.effect_system, self.texturizer)
         self.input_system = InputSystem(self.board_view, self.event_bus)
     
         self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system, self.data_registry, self.view_registry)

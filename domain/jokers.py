@@ -8,7 +8,7 @@ from domain.card import Card
 from domain.definitions import *
 from domain.poker import HandEvaluator
 
-from core.event_bus import EventBus, EventTriggerCard
+from core.event_bus import EventBus, EventTriggerCard, EventChangeEnhancement
 
 logger = logging.getLogger(__name__)
 
@@ -382,14 +382,27 @@ class JokerRaisedFist(Joker):
         super().__init__(name='RaisedFist', event_bus=event_bus)
         self.data.cost = 5
 
-    def trigger_on_end_hand(self, board: BoardVision):
-        cards = [card for card in board.get_hand_cards() if card.get_rank() != Rank.NONE]
-        cards.sort(key=lambda x: x.get_rank().value)
-        mult = 2 * base_value_map[cards[0].get_rank()]
+    def _is_card_min(self, card: Card, cards: list[Card]) -> bool:
+        cards = [card for card in cards if card.get_rank() != Rank.NONE]
+        if len(cards) == 0:
+            return False
+        cards.sort(key=lambda x: (x.get_rank().value, x.id))
+        if card is cards[0]:
+            return True
+        return False
+
+    def trigger_on_card_in_hand(self, card: Card, board: BoardVision) -> None:
+        if not self._is_card_min(card, board.get_hand_cards()):
+            return
+        mult = 2 * base_value_map[card.get_rank()]
         board.add_mult(mult)
-        self.event_bus.add_event(EventTriggerCard(self.id, mult=mult))
+        self.event_bus.add_event(EventTriggerCard(self.id, mult=mult, halt=False))
+        self.event_bus.add_event(EventTriggerCard(card.id))
         logger.info(f'{self.data.name} added {mult} mult')
-        super().trigger_on_end_hand(board)
+        super().trigger_on_card_in_hand(card, board)
+    
+    def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
+        return self._is_card_min(card, board.get_hand_cards())
 
 
 class JokerChaosTheClown(Joker):
@@ -408,7 +421,8 @@ class JokerFibonacci(Joker):
         if card.get_rank() in [Rank.TWO, Rank.THREE, Rank.FIVE, Rank.EIGHT, Rank.ACE]:
             board.add_mult(8)
             logger.info(f'{self.data.name} added 8 mult')
-            self.event_bus.add_event(EventTriggerCard(self.id, mult=8))
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=8, halt=False))
+            self.event_bus.add_event(EventTriggerCard(card.id))
         super().trigger_on_play_card(card, board)
 
 
@@ -437,7 +451,8 @@ class JokerScaryFace(Joker):
         if board.get_evaluation_rules().is_face_card(card):
             board.add_chips(30)
             logger.info(f'{self.data.name} added 30 chips')
-            self.event_bus.add_event(EventTriggerCard(self.id, chips=30))
+            self.event_bus.add_event(EventTriggerCard(self.id, chips=30, halt=False))
+            self.event_bus.add_event(EventTriggerCard(card.id))
 
 
 class JokerAbstractJoker(Joker):
@@ -532,8 +547,10 @@ class JokerScholar(Joker):
             board.add_chips(20)
             board.add_mult(4)
             logger.info(f'{self.data.name} added 20 chips, 4 mult')
-            self.event_bus.add_event(EventTriggerCard(self.id, chips=20))
-            self.event_bus.add_event(EventTriggerCard(self.id, mult=4))
+            self.event_bus.add_event(EventTriggerCard(self.id, halt=False))
+            self.event_bus.add_event(EventTriggerCard(card.id, chips=20, is_joker=False))
+            self.event_bus.add_event(EventTriggerCard(self.id, halt=False))
+            self.event_bus.add_event(EventTriggerCard(card.id, mult=4, is_joker=False))
         super().trigger_on_play_card(card, board)
 
 
@@ -568,10 +585,15 @@ class JokerRideTheBus(Joker):
             self.mult = 0
             logger.info(f'{self.data.name} reset')
             self.event_bus.add_event(EventTriggerCard(self.id, custom_text='reset'))
+        else:
+            self.mult += 1
         return super().trigger_on_start_hand(board)
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
-        raise NotImplementedError('not implemented yet')
+        if self.mult > 0:
+            board.add_mult(self.mult)
+            logger.info(f'{self.data.name} added {self.mult} mult')
+            self.event_bus.add_event(EventTriggerCard(self.id, mult=self.mult))
 
 
 class JokerSpaceJoker(Joker):
@@ -624,6 +646,7 @@ class JokerRunner(Joker):
     def trigger_on_start_hand(self, board) -> None:
         if board.get_current_hand_type() in [HandType.STRAIGHT, HandType.STRAIGHT_FLUSH]:
             self.chips += 15
+            self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Upgrade'))
         return super().trigger_on_start_hand(board)
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -728,6 +751,7 @@ class JokerGreenJoker(Joker):
     
     def trigger_on_start_hand(self, board: BoardVision) -> None:
         self.mult += 1
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='+1 mult'))
         super().trigger_on_start_hand(board)
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
@@ -852,9 +876,11 @@ class JokerVampire(Joker):
         for card in board.get_played_cards():
             if card.data.enhancement != Enhancement.NONE:
                 card.data.enhancement = Enhancement.NONE
+                self.event_bus.add_event(EventChangeEnhancement(card.id, Enhancement.NONE))
+                self.event_bus.add_event(EventTriggerCard(card.id, halt=False))
                 self.enhancements += 1
                 logger.info(f'{self.data.name} removed enhancement from {card}')
-                self.upgraded = True
+                upgraded = True
         if upgraded:
             self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Upgrade'))
         super().trigger_on_start_hand(board)
@@ -955,9 +981,11 @@ class JokerMidasMask(Joker):
     
     def trigger_on_start_hand(self, board):
         affected = False
-        for card in board.get_selected_cards():
+        for card in board.get_played_cards():
             if board.get_evaluation_rules().is_face_card(card):
                 card.data.enhancement = Enhancement.GOLD
+                self.event_bus.add_event(EventChangeEnhancement(card.id, Enhancement.GOLD))
+                self.event_bus.add_event(EventTriggerCard(card.id, halt=False))
                 affected = True
         if affected:
             self.event_bus.add_event(EventTriggerCard(self.id))
@@ -1226,17 +1254,17 @@ class JokerRamen(Joker):
         super().__init__(name='Ramen', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
-        self.remaining_discards = 200
+        self.discards_made = 200
     
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
-        mult = 1 + self.remaining_discards * 0.01
+        mult = 1 + self.discards_made * 0.01
         board.add_time_mult(mult)
         logger.info(f'{self.data.name} added {mult} time-mult')
         self.event_bus.add_event(EventTriggerCard(self.id, time_mult=mult))
         super().trigger_on_play_card(card, board)
     
     def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
-        self.remaining_discards -= 1
+        self.discards_made -= 1
 
     def trigger_on_end_round(self, board: BoardVision) -> None:
         self.suit = choice([Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS])

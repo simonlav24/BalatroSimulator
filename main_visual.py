@@ -24,10 +24,8 @@ def initialize_data() -> Director:
     for card in deck:
         new_card = factory.create_playing_card(card.rank, card.suit)
         player.add_card_to_deck(new_card)
-    player.add_joker(factory.create_joker_card(JokerJimbo))
-    player.add_joker(factory.create_joker_card(JokerBaron))
-    player.add_joker(factory.create_joker_card(JokerMime))
-    player.add_joker(factory.create_joker_card(JokerSockAndBuskin))
+    player.add_joker(factory.create_joker_card(JokerPhotograph))
+    player.add_joker(factory.create_joker_card(JokerHangingChad))
 
     player.reset()
     player.shuffle()

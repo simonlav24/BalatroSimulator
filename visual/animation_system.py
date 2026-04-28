@@ -16,9 +16,11 @@ from core.event_bus import (
     EventReorderCards,
     GameEventUpdateScore,
     GameEventEndHand,
+    EventChangeEnhancement,
 )
 from core.data_registry import CardProtocol
 
+from domain.card import CardData
 from visual.card_view import CardView
 from visual.view_registry import ViewRegistry
 from visual.board_view import BoardView
@@ -26,6 +28,7 @@ from visual.layout import CardRow
 from visual.definitions import FPS
 from visual.effects import TriggerEffect, create_trigger_effect
 from visual.effect_system import EffectSystem
+from visual.texturizer import CardTexturizer
 
 DEBUG = False
 
@@ -115,10 +118,16 @@ class AnimEventTrigger(Animation):
         self.is_done = True
 
 
+
+#############################################################################
+#                             Animation System
+#############################################################################
+
 class AnimationSystem:
-    def __init__(self, view_reg: ViewRegistry, board_view: BoardView, effect_system: EffectSystem):
+    def __init__(self, view_reg: ViewRegistry, board_view: BoardView, effect_system: EffectSystem, texturizer: CardTexturizer):
         self.view_reg = view_reg
         self.board_view = board_view
+        self.texturizer = texturizer
         self.animation_queue: list[Animation] = []
         self.state = State.IDLE
 
@@ -214,8 +223,16 @@ class AnimationSystem:
             area[board_area].cards[:] = [id_to_card[cid] for cid in card_ids]
         self.animation_queue.append(AnimFunc(reorder, [event.card_ids, event.board_area]))
         self.animation_queue.append(AnimRecalc(self.board_view))
+    
+    def _handle_change_enhancement(self, event, event_bus: EventBus) -> None:
+        # self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
+        def retexture(texturizer: CardTexturizer, card_id: int):
+            texturizer.retexture_enhancement(card_id, event.enhancement)
+        self.animation_queue.append(AnimFunc(retexture, [self.texturizer, event.id]))
+        # self.animation_queue.append(AnimWait(FPS * TRIGGER_BASE_WAIT))
 
     def set_up(self, event_bus: EventBus):
+        self.time_skew = 1.0
         handlers = {
             EventStartPlay: self._handle_start_play,
             EventTriggerCard: self._handle_trigger_card,
@@ -225,6 +242,7 @@ class AnimationSystem:
             EventDiscardCard: self._handle_discard,
             EventDrawCard: self._handle_draw_card,
             EventReorderCards: self._handle_reorder,
+            EventChangeEnhancement: self._handle_change_enhancement
         }
         for event in event_bus.get_round_queue():
             handler = handlers.get(type(event))

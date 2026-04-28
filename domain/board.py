@@ -26,7 +26,7 @@ class Board:
 
         self.current_hand_type: HandType = HandType.HIGH_CARD
         self.levels: dict[HandType, dict[str, int]] = {hand_type: {'level': 1, 'played': 0} for hand_type in HandType}
-        self.calc_mode: CalcMode = CalcMode.BEST
+        self.calc_mode: CalcMode = CalcMode.SIMULATE
 
     def play_initialize(self):
         self.data.remaining_hands -= 1
@@ -106,8 +106,12 @@ class Board:
         return {'score': final_score, 'chips': self.chips, 'mult': self.mult}
 
     def get_initial_score(self, cards: list[Card]) -> tuple[str, int, float]:
+        '''show initial hand type and score'''
         if len(cards) == 0:
             return (None, None), 0, 0.0
+        self.evaluation_rules = EvaluationRules()
+        for joker in self.jokers:
+            joker.change_evaluation_rules(self)
         hand_type, _ = asses_poker_hand(cards, self.evaluation_rules)
         hand_level = self.levels[hand_type]['level']
         chips, mult = get_hand_level_chips_mult(hand_type, hand_level)

@@ -20,7 +20,7 @@ class CardFactory:
         card = Card(CardData(rank, suit, enhancement, edition, seal), self.event_bus)
         self.data_registry.register(card)
 
-        surf = create_card_surf(card.data)
+        surf = create_card_surf(card.data.rank, card.data.suit, card.data.enhancement, card.data.seal, card.data.edition)
         card_view = CardView(card.id, surf)
         self.view_registry.register(card_view)
         return card

@@ -3,6 +3,7 @@ from math import degrees
 from pygame import Surface
 
 from domain.card import CardData
+from domain.definitions import Enhancement, Edition, Seal
 
 from visual.definitions import *
 from visual.board_view import BoardView
@@ -10,17 +11,16 @@ from visual.view_registry import ViewRegistry
 from visual.input_system import InputSystem
 from visual.card_view import CardView
 from visual.layout import CardRow
-from visual.animation_system import AnimationSystem
 
 
-def create_card_surf(data: CardData) -> Surface:
+def create_card_surf(rank: Rank, suit: Suit, enhancement: Enhancement, seal: Seal, edition: Edition) -> Surface:
     # back
-    card_surf = card_surf_at(card_backs_texture, *enhancement_map[data.enhancement])
+    card_surf = card_surf_at(card_backs_texture, *enhancement_map[enhancement])
     # image
-    card_surf.blit(rank_suit_at(data.rank, data.suit))
+    card_surf.blit(rank_suit_at(rank, suit))
 
-    if data.seal != Seal.NONE:
-        card_surf.blit(card_surf_at(card_backs_texture, *seal_map[data.seal]))
+    if seal != Seal.NONE:
+        card_surf.blit(card_surf_at(card_backs_texture, *seal_map[seal]))
 
     return card_surf
 
@@ -36,6 +36,7 @@ def draw_card(card: CardView, surf: Surface):
 def draw_row_debug(row: CardRow, surf: Surface) -> None:
     pygame.draw.circle(surf, (255,0,0), row.pos, 2)
     pygame.draw.line(surf, (255,0,0), row.pos - Vector2(row.width / 2, 0), row.pos + Vector2(row.width / 2, 0))
+
 
 
 class Renderer:

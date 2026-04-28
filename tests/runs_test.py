@@ -230,3 +230,42 @@ class TestRuns(unittest.TestCase):
             joker(JokerHack)
         ]
         self.assertEqual(board.play_test()['score'], 84122)
+    
+    def test_raised_fist(self):
+        card = self.factory.card
+        joker = self.factory.joker
+        board = Board()
+        board.hand_cards = [
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+            card(suit=Suit.HEARTS, rank=Rank.SIX),
+        ]
+        board.selected_cards = [
+            card(suit=Suit.CLUBS, rank=Rank.SIX),
+        ]
+        board.jokers = [
+            joker(JokerRaisedFist),
+        ]
+        self.assertEqual(board.play_test()['score'], 143)
+        board.jokers.append(joker(JokerMime))
+        self.assertEqual(board.play_test()['score'], 275)
+    
+    def test_goledn_vampire(self):
+        card = self.factory.card
+        joker = self.factory.joker
+        board = Board()
+        board.hand_cards = [
+        ]
+        board.selected_cards = [
+            card(suit=Suit.CLUBS, rank=Rank.JACK),
+            card(suit=Suit.CLUBS, rank=Rank.JACK),
+            card(suit=Suit.CLUBS, rank=Rank.JACK),
+        ]
+        board.jokers = [
+            joker(JokerMidasMask),
+            joker(JokerVampire),
+        ]
+        self.assertEqual(board.play_test()['score'], 234)
