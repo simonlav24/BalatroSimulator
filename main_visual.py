@@ -52,7 +52,7 @@ def main():
     factory = director.get_card_factory()
     player = director.get_player()
 
-    ui = director.initialize_round_ui()
+    director.initialize_round_ui()
 
     # Main loop
     done = False
@@ -77,7 +77,6 @@ def main():
         # draw
         win.fill((0, 0, 0))
         
-        ui.draw(win)
         director.renderer.draw(win)
 
 

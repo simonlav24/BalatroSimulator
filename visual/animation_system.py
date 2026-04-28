@@ -25,6 +25,7 @@ from visual.board_view import BoardView
 from visual.layout import CardRow
 from visual.definitions import FPS
 from visual.effects import TriggerEffect, create_trigger_effect
+from visual.effect_system import EffectSystem
 
 DEBUG = False
 
@@ -115,13 +116,13 @@ class AnimEventTrigger(Animation):
 
 
 class AnimationSystem:
-    def __init__(self, view_reg: ViewRegistry, board_view: BoardView):
+    def __init__(self, view_reg: ViewRegistry, board_view: BoardView, effect_system: EffectSystem):
         self.view_reg = view_reg
         self.board_view = board_view
         self.animation_queue: list[Animation] = []
         self.state = State.IDLE
 
-        self.effects: list[TriggerEffect] = []
+        self.effect_system = effect_system
         self.time_skew = 1.0
 
     def step(self):
@@ -135,10 +136,6 @@ class AnimationSystem:
             self.animation_queue[0].step()
             if self.animation_queue[0].is_done:
                 self.animation_queue.pop(0)
-        
-        for effect in self.effects:
-            effect.step()
-        self.effects = [effect for effect in self.effects if not effect.is_done]
 
     def _handle_start_play(self, event, event_bus: EventBus) -> None:
         # remove from row and add to play area
@@ -151,11 +148,11 @@ class AnimationSystem:
     def _handle_trigger_card(self, event, event_bus: EventBus) -> None:
         self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
         self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
-        def add_effect(animation_sys: AnimationSystem, effect: TriggerEffect):
-            animation_sys.effects.append(effect)
+        def add_effect(effect: TriggerEffect):
+            self.effect_system.add_effect(effect)
         effect = create_trigger_effect(event, self.view_reg, self.time_skew)
         if effect:
-            self.animation_queue.append(AnimFunc(add_effect, [self, effect]))
+            self.animation_queue.append(AnimFunc(add_effect, [effect]))
         if event.halt:
             wait_time = max(MINIMUM_TIME_SKEW, FPS * TRIGGER_BASE_WAIT * self.time_skew)
             self.time_skew *= TIME_SKEW_MULTIPLIER
@@ -237,7 +234,3 @@ class AnimationSystem:
     
     def play(self):
         self.state = State.RUNNING
-    
-    def draw(self, win) -> None:
-        for effect in self.effects:
-            effect.draw(win)

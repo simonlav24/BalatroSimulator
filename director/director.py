@@ -10,6 +10,7 @@ from visual.view_registry import ViewRegistry
 from visual.renderer import Renderer
 from visual.input_system import InputSystem
 from visual.animation_system import AnimationSystem
+from visual.effect_system import EffectSystem
 from visual.board_view import BoardView
 from visual.ui_layer_round import UILayerRound
 
@@ -27,11 +28,14 @@ class Director:
 
         self.board_view = BoardView(self.view_registry, self.data_registry)
 
-        self.animation_system = AnimationSystem(self.view_registry, self.board_view)
-        self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system, self.data_registry, self.view_registry)
+        self.effect_system = EffectSystem()
+        self.animation_system = AnimationSystem(self.view_registry, self.board_view, self.effect_system)
         self.input_system = InputSystem(self.board_view, self.event_bus)
     
-        self.renderer = Renderer(self.board_view, self.view_registry, self.input_system, self.animation_system)
+        self.board_player = BoardPlayer(self.board, self.board_view, self.event_bus, self.animation_system, self.data_registry, self.view_registry)
+
+        self.renderer = Renderer(self.board_view, self.view_registry, self.input_system)
+        self.renderer.register_system(self.effect_system)
         self.ui_layer = None
         
     def get_card_factory(self) -> CardFactory:
@@ -50,11 +54,12 @@ class Director:
         self.input_system.step()
         self.board_view.step()
         self.animation_system.step()
+        self.effect_system.step()
 
     def initialize_round_ui(self):
         ui = UILayerRound(self.input_system, self.event_bus)
         self.ui_layer = ui
-        return ui
+        self.renderer.ui_layer = self.ui_layer
 
 
 

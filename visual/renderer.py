@@ -39,19 +39,33 @@ def draw_row_debug(row: CardRow, surf: Surface) -> None:
 
 
 class Renderer:
-    def __init__(self, board: BoardView, view_reg: ViewRegistry, input_system: InputSystem, anim_sys: AnimationSystem):
-        self.board = board
+    def __init__(self, board_view: BoardView, view_reg: ViewRegistry, input_system: InputSystem):
+        self.board = board_view
         self.view_reg = view_reg
         self.input_system = input_system
-        self.anim_sys = anim_sys
+        self.ui_layer = None
+
+        self.systems = []
+
+    def register_system(self, system) -> None:
+        self.systems.append(system)
 
     def draw(self, win: Surface) -> None:
+        # draw ui
+        if self.ui_layer:
+            self.ui_layer.draw(win)
+
+        # draw cards
         for row in self.board.rows:
             draw_row_debug(row, win)
             for card in row.cards:
                 draw_card(card, win)
         
+        # redraw dragged card
         if self.input_system.dragged is not None:
             draw_card(self.input_system.dragged, win)
         
-        self.anim_sys.draw(win)
+        # draw systems
+        for system in self.systems:
+            system.draw(win)
+
