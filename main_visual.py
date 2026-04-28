@@ -22,7 +22,7 @@ def initialize_data() -> Director:
 
     deck = create_standard_deck()
     for card in deck:
-        new_card = factory.create_playing_card(card.rank, card.suit, Enhancement.STEEL, seal=Seal.RED)
+        new_card = factory.create_playing_card(card.rank, card.suit)
         player.add_card_to_deck(new_card)
     player.add_joker(factory.create_joker_card(JokerJimbo))
     player.add_joker(factory.create_joker_card(JokerBaron))

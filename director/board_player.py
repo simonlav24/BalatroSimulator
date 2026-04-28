@@ -88,7 +88,6 @@ class BoardPlayer:
             # self.board_view.hand_row.add(self.view_reg[card_id])
         
         self._sort()
-        # self.sync_to_view()
 
         for card in self.board.hand_cards:
             if card.id in drawn_cards_ids:

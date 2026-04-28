@@ -28,6 +28,12 @@ from visual.effects import TriggerEffect, create_trigger_effect
 
 DEBUG = False
 
+TRIGGER_BASE_WAIT = 0.5
+TIME_SKEW_MULTIPLIER = 0.95
+MINIMUM_TIME_SKEW = 5.0
+BASE_WAIT = 0.25
+BASE_WAIT_QUICK = 0.1
+
 
 class State(Enum):
     IDLE = 0
@@ -116,6 +122,7 @@ class AnimationSystem:
         self.state = State.IDLE
 
         self.effects: list[TriggerEffect] = []
+        self.time_skew = 1.0
 
     def step(self):
         if self.state == State.IDLE:
@@ -133,112 +140,103 @@ class AnimationSystem:
             effect.step()
         self.effects = [effect for effect in self.effects if not effect.is_done]
 
+    def _handle_start_play(self, event, event_bus: EventBus) -> None:
+        # remove from row and add to play area
+        for card in [self.view_reg[id] for id in event.card_ids]:
+            self.board_view.hand_row.remove(card)
+            self.board_view.played_row.add(card)
+            self.animation_queue.append(AnimRecalc(self.board_view))
+            self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
+    
+    def _handle_trigger_card(self, event, event_bus: EventBus) -> None:
+        self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
+        self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
+        def add_effect(animation_sys: AnimationSystem, effect: TriggerEffect):
+            animation_sys.effects.append(effect)
+        effect = create_trigger_effect(event, self.view_reg, self.time_skew)
+        if effect:
+            self.animation_queue.append(AnimFunc(add_effect, [self, effect]))
+        if event.halt:
+            wait_time = max(MINIMUM_TIME_SKEW, FPS * TRIGGER_BASE_WAIT * self.time_skew)
+            self.time_skew *= TIME_SKEW_MULTIPLIER
+            self.animation_queue.append(AnimWait(wait_time))
+    
+    def _handle_select_for_play(self, event, event_bus: EventBus) -> None:
+        # select playable cards
+        for card in [self.view_reg[id] for id in event.card_ids]:
+            self.animation_queue.append(AnimCardSelect(card))
+            self.animation_queue.append(AnimRecalc(self.board_view))
+            self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
+        self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
+    
+    def _handle_deselect(self, event, event_bus: EventBus) -> None:
+        for card in [self.view_reg[id] for id in event.card_ids]:
+            self.animation_queue.append(AnimCardSelect(card))
+        self.animation_queue.append(AnimRecalc(self.board_view))
+        self.animation_queue.append(AnimEventTrigger(event_bus, GameEventEndHand()))
+        self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
+
+    def _handle_clear_out(self, event, event_bus: EventBus) -> None:
+        def clear_out():
+            cards = self.board_view.played_row.cards.copy()
+            for card in cards:
+                self.board_view.played_row.remove(card)
+                self.board_view.discard_pile.add(card)
+        self.animation_queue.append(AnimFunc(clear_out, []))
+        self.animation_queue.append(AnimRecalc(self.board_view))
+        self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
+    
+    def _handle_discard(self, event, event_bus: EventBus) -> None:
+        card_id = event.card_id
+        def remove(id):
+            self.board_view.hand_row.remove(self.view_reg[id])
+            self.board_view.discard_pile.add(self.view_reg[id])
+        self.animation_queue.append(AnimFunc(remove, [card_id]))
+        self.animation_queue.append(AnimRecalc(self.board_view))
+        self.animation_queue.append(AnimWait(FPS * BASE_WAIT_QUICK))
+    
+    def _handle_draw_card(self, event, event_bus: EventBus) -> None:
+        card_id = event.card_id
+        def add(id, drawn_index, board_area):
+            area: dict[BoardArea, CardRow] = {
+                BoardArea.HAND: self.board_view.hand_row,
+                BoardArea.JOKER: self.board_view.joker_row,
+            }
+            area[board_area].add(self.view_reg[id], drawn_index)
+        self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index, event.board_area]))
+        self.animation_queue.append(AnimRecalc(self.board_view))
+        self.animation_queue.append(AnimWait(FPS * BASE_WAIT_QUICK))
+    
+    def _handle_reorder(self, event, event_bus: EventBus) -> None:
+        def reorder(card_ids, board_area):
+            area: dict[BoardArea, CardRow] = {
+                BoardArea.HAND: self.board_view.hand_row,
+                BoardArea.JOKER: self.board_view.joker_row,
+            }
+            id_to_card = {card.id: card for card in area[board_area].cards}
+            area[board_area].cards[:] = [id_to_card[cid] for cid in card_ids]
+        self.animation_queue.append(AnimFunc(reorder, [event.card_ids, event.board_area]))
+        self.animation_queue.append(AnimRecalc(self.board_view))
+
     def set_up(self, event_bus: EventBus):
-
-        time_skew = 1.0
+        handlers = {
+            EventStartPlay: self._handle_start_play,
+            EventTriggerCard: self._handle_trigger_card,
+            EventSelectCardsForPlay: self._handle_select_for_play,
+            EventDeselect: self._handle_deselect,
+            EventClearOut: self._handle_clear_out,
+            EventDiscardCard: self._handle_discard,
+            EventDrawCard: self._handle_draw_card,
+            EventReorderCards: self._handle_reorder,
+        }
         for event in event_bus.get_round_queue():
+            handler = handlers.get(type(event))
+            if handler:
+                handler(event, event_bus)
 
-            if isinstance(event, EventStartPlay):
-                # remove from row and add to play area
-                for card in [self.view_reg[id] for id in event.card_ids]:
-                    self.board_view.hand_row.remove(card)
-                    self.board_view.played_row.add(card)
-                    self.animation_queue.append(AnimRecalc(self.board_view))
-                    self.animation_queue.append(AnimWait(FPS * 0.25))
-
-            elif isinstance(event, EventTriggerCard):
-                self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
-                self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
-                def add_effect(animation_sys: AnimationSystem, effect: TriggerEffect):
-                    animation_sys.effects.append(effect)
-                effect = create_trigger_effect(event, self.view_reg, time_skew)
-                if effect:
-                    self.animation_queue.append(AnimFunc(add_effect, [self, effect]))
-                if event.halt:
-                    wait_time = max(5.0, FPS * 0.5 * time_skew)
-                    time_skew *= 0.95
-                    self.animation_queue.append(AnimWait(wait_time))
-            
-            elif isinstance(event, EventSelectCardsForPlay):
-                # select playable cards
-                for card in [self.view_reg[id] for id in event.card_ids]:
-                    self.animation_queue.append(AnimCardSelect(card))
-                    self.animation_queue.append(AnimRecalc(self.board_view))
-                    self.animation_queue.append(AnimWait(FPS * 0.25))
-                self.animation_queue.append(AnimWait(FPS * 0.25))
-            
-            elif isinstance(event, EventDeselect):
-                for card in [self.view_reg[id] for id in event.card_ids]:
-                    self.animation_queue.append(AnimCardSelect(card))
-                self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimEventTrigger(event_bus, GameEventEndHand()))
-                self.animation_queue.append(AnimWait(FPS * 1))
-            
-            elif isinstance(event, EventClearOut):
-                def clear_out():
-                    cards = self.board_view.played_row.cards.copy()
-                    for card in cards:
-                        self.board_view.played_row.remove(card)
-                        self.board_view.discard_pile.add(card)
-                self.animation_queue.append(AnimFunc(clear_out, []))
-                self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimWait(FPS * 0.25))
-            
-            elif isinstance(event, EventDiscardCard):
-                card_id = event.card_id
-                def remove(id):
-                    self.board_view.hand_row.remove(self.view_reg[id])
-                    self.board_view.discard_pile.add(self.view_reg[id])
-                self.animation_queue.append(AnimFunc(remove, [card_id]))
-                self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimWait(FPS * 0.1))
-            
-            elif isinstance(event, EventDrawCard):
-                card_id = event.card_id
-                def add(id, drawn_index, board_area):
-                    area: dict[BoardArea, CardRow] = {
-                        BoardArea.HAND: self.board_view.hand_row,
-                        BoardArea.JOKER: self.board_view.joker_row,
-                    }
-                    area[board_area].add(self.view_reg[id], drawn_index)
-                self.animation_queue.append(AnimFunc(add, [card_id, event.drawn_index, event.board_area]))
-                self.animation_queue.append(AnimRecalc(self.board_view))
-                self.animation_queue.append(AnimWait(FPS * 0.1))
-            
-            elif isinstance(event, EventReorderCards):
-                def reorder(card_ids, board_area):
-                    area: dict[BoardArea, CardRow] = {
-                        BoardArea.HAND: self.board_view.hand_row,
-                        BoardArea.JOKER: self.board_view.joker_row,
-                    }
-                    id_to_card = {card.id: card for card in area[board_area].cards}
-                    area[board_area].cards[:] = [id_to_card[cid] for cid in card_ids]
-                self.animation_queue.append(AnimFunc(reorder, [event.card_ids, event.board_area]))
-                self.animation_queue.append(AnimRecalc(self.board_view))
     
     def play(self):
         self.state = State.RUNNING
-    
-    def sync_to_view(self, BoardArea) -> None:
-        '''reorder view to match domain order'''
-        mappings: list[tuple[CardRow, list[CardProtocol]]] = [
-            (self.board_view.hand_row, self.board.hand_cards),
-            (self.board_view.played_row, self.board.played_cards),
-            (self.board_view.joker_row, self.board.jokers),
-        ]
-
-        for row, domain_row in mappings:
-            row_ids = [card.id for card in row.cards]
-            domain_ids = [card.id for card in domain_row]
-
-            if row_ids == domain_ids:
-                continue  # already synced
-
-            if set(row_ids) != set(domain_ids):
-                raise ValueError("View/domain mismatch — cannot safely reorder")
-
-            id_to_card = {card.id: card for card in row.cards}
-            row.cards[:] = [id_to_card[cid] for cid in domain_ids]
     
     def draw(self, win) -> None:
         for effect in self.effects:
