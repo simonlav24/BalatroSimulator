@@ -60,6 +60,7 @@ class Text(UIElement):
         self.scale.step()
 
     def draw(self, surf: Surface) -> None:
+        # pygame.draw.rect(surf, (255, 0, 0), self.rect, 1)
         if self.back_color:
             pygame.draw.rect(surf, self.back_color, self.rect, border_radius=7)
         text_surf = pygame.transform.rotozoom(self.surf, self.angle(), self.scale())

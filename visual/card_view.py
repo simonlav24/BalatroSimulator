@@ -71,5 +71,5 @@ class CardView:
         self.scale.step()
     
     def nudge(self, factor: float=1.0) -> None:
-        self.angle.nudge(uniform(7 * factor, -7 * factor))
-        self.scale.nudge(5 * factor)
+        self.angle.nudge(uniform(10 * factor, -10 * factor))
+        self.scale.nudge(8 * factor)

@@ -23,6 +23,7 @@ class EventTriggerCard:
     chips: float = 0
     mult: float = 0.0
     time_mult: float = 1.0
+    money: int = 0
     custom_text: str = None
     halt: bool = True
     is_joker: bool = True
@@ -105,6 +106,7 @@ class GameEventReset:
 class GameEventInitialize:
     hands: int
     discards: int
+    money: int
     
 
 @dataclass
@@ -112,6 +114,7 @@ class GameEventUpdateScore:
     chips: int = 0
     mult: float = 0.0
     time_mult: float = 1.0
+    money: int = 0
     absolute: bool = False
     hand_info: tuple[str, int] = (None, None)
 

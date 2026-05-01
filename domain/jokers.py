@@ -558,6 +558,19 @@ class JokerBusinessCard(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Business Card', event_bus=event_bus)
         self.data.cost = 4
+    
+    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
+        if board.get_evaluation_rules().is_face_card(card):
+            activate = False
+            if board.get_mode() == CalcMode.SIMULATE:
+                activate = randint(0, 1) == 0
+            elif board.get_mode() == CalcMode.BEST:
+                self.active = True
+            if activate:
+                board.add_money(2)
+                logger.info(f'{self.data.name} added $2')
+                self.event_bus.add_event(EventTriggerCard(self.id, money=2))
+        super().trigger_on_play_card(card, board)
 
 
 class JokerSupernova(Joker):
@@ -772,7 +785,15 @@ class JokerToDoList(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='To Do List', event_bus=event_bus)
         self.data.cost = 4
+        self.hand_type = HandType.HIGH_CARD
 
+    def trigger_on_start_hand(self, board: BoardVision) -> None:
+        if board.get_current_hand_type() == self.hand_type:
+            logger.info(f'{self.data.name} added $4')
+            self.event_bus.add_event(EventTriggerCard(self.id, money=4))
+
+        super().trigger_on_start_hand(board)
+    
 
 class JokerCavendish(Joker):
     def __init__(self, event_bus: EventBus):
@@ -1050,6 +1071,21 @@ class JokerReservedParking(Joker):
         super().__init__(name='Reserved Parking', event_bus=event_bus)
         self.data.cost = 6
     
+    def trigger_on_card_in_hand(self, card: Card, board: BoardVision) -> None:
+        if board.get_evaluation_rules().is_face_card(card):
+            activate = False
+            if board.get_mode() == CalcMode.BEST:
+                activate = True
+            elif board.get_mode() == CalcMode.SIMULATE:
+                activate = randint(0, 1) == 0
+            if activate:
+                board.add_money(1)
+                logger.info(f'{self.data.name} added $1')
+                self.event_bus.add_event(EventTriggerCard(self.id, money=1, halt=False))
+                self.event_bus.add_event(EventTriggerCard(card.id))
+
+        super().trigger_on_card_in_hand(card, board)
+
     def card_has_effect_in_hand(self, card: Card, board: BoardVision) -> bool:
         return board.get_evaluation_rules().is_face_card(card)
 
@@ -1357,7 +1393,8 @@ class JokerGoldenTicket(Joker):
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
         if card.data.enhancement == Enhancement.GOLD:
             board.get_data().money += 4
-            logger.info(f'{self.data.name} added 4 gold')
+            logger.info(f'{self.data.name} added $4')
+            self.event_bus.add_event(EventTriggerCard(self.id, money=4))
         super().trigger_on_play_card(card, board)
 
 
@@ -1470,8 +1507,8 @@ class JokerRoughGem(Joker):
     def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
         if board.get_evaluation_rules().is_suit(card, Suit.DIAMONDS):
             board.get_data().money += 1
-            logger.info(f'{self.data.name} added 1 gold')
-            self.event_bus.add_event(EventTriggerCard(self.id))
+            logger.info(f'{self.data.name} added $1')
+            self.event_bus.add_event(EventTriggerCard(self.id, money=4))
         super().trigger_on_play_card(card, board)
 
 

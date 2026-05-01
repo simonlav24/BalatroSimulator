@@ -154,9 +154,9 @@ class AnimationSystem:
             self.animation_queue.append(AnimRecalc(self.board_view))
             self.animation_queue.append(AnimWait(FPS * BASE_WAIT))
     
-    def _handle_trigger_card(self, event, event_bus: EventBus) -> None:
+    def _handle_trigger_card(self, event: EventTriggerCard, event_bus: EventBus) -> None:
         self.animation_queue.append(AnimCardNudge(self.view_reg[event.id]))
-        self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult)))
+        self.animation_queue.append(AnimEventTrigger(event_bus, GameEventUpdateScore(chips=event.chips, mult=event.mult, time_mult=event.time_mult, money=event.money)))
         def add_effect(effect: TriggerEffect):
             self.effect_system.add_effect(effect)
         effect = create_trigger_effect(event, self.view_reg, self.time_skew)

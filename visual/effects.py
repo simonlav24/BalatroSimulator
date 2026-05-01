@@ -58,6 +58,9 @@ def create_trigger_effect(event: EventTriggerCard, reg: ViewRegistry, time_skew:
     elif event.time_mult > 1.0:
         text = f'x{event.time_mult} mult'
         color = Colors.PURPLE
+    elif event.money > 0:
+        text = f'${event.money}'
+        color = Colors.YELLOW
     elif event.custom_text:
         text = event.custom_text
         color = Colors.YELLOW

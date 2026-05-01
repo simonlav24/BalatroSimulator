@@ -67,7 +67,7 @@ class BoardPlayer:
         self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True, hand_info=hand_info))
 
     def _handle_reset(self, event: GameEventReset) -> None:
-        initialize_event = GameEventInitialize(self.board.data.remaining_hands, self.board.data.remaining_discards)
+        initialize_event = GameEventInitialize(self.board.data.remaining_hands, self.board.data.remaining_discards, self.board.data.money)
         self.event_bus.add_game_event(initialize_event)
 
 

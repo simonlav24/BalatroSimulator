@@ -29,8 +29,9 @@ class UILayerRound:
         self.info_text = Text((60, 300, 240, 60), '', Colors.WHITE, None)
         self.round_score_text = Text((60, 240, 240, 60), '0', Colors.WHITE, None)
 
-        self.remaining_hands_text = Text((150, 480, 240, 60), '12', Colors.BLUE, None)
-        self.remaining_discards_text = Text((210, 480, 240, 60), '12', Colors.RED, None)
+        self.remaining_hands_text = Text((150, 480, 50, 40), '0', Colors.BLUE, None)
+        self.remaining_discards_text = Text((200, 480, 50, 40), '0', Colors.RED, None)
+        self.money_text = Text((150, 520, 100, 40), '0', Colors.YELLOW, None)
 
         self.chips = 0
         self.mult = 0
@@ -38,6 +39,7 @@ class UILayerRound:
         self.info = 'hello'
         self.remaining_discards = 0
         self.remaining_hands = 0
+        self.money = 0
 
         input_system.register_ui_element(self.button_play)
         input_system.register_ui_element(self.button_discard)
@@ -47,19 +49,23 @@ class UILayerRound:
         input_system.register_ui_element(self.round_score_text)
         input_system.register_ui_element(self.remaining_hands_text)
         input_system.register_ui_element(self.remaining_discards_text)
+        input_system.register_ui_element(self.money_text)
     
     def _handle_update_score(self, event: GameEventUpdateScore) -> None:
         nudge_chips = False
         nudge_mult = False
+        nudge_money = False
         if event.absolute:
             self.chips = event.chips
             self.mult = event.mult
         else:
             nudge_chips = event.chips != 0
             nudge_mult = event.mult != 0.0 or event.time_mult != 1.0
+            nudge_money = event.money != 0
             self.chips += event.chips
             self.mult += event.mult
             self.mult *= event.time_mult
+            self.money += event.money
 
         self.chips_text.update(str(self.chips))
         if nudge_chips:
@@ -70,6 +76,11 @@ class UILayerRound:
         if nudge_mult:
             self.mult_text.angle.nudge(degrees(10))
             self.mult_text.scale.nudge(20)
+        
+        self.money_text.update('$' + str(self.money))
+        if nudge_mult:
+            self.money_text.angle.nudge(degrees(10))
+            self.money_text.scale.nudge(20)
         
         if event.hand_info[0] is None:
             self.info = ''
@@ -98,6 +109,8 @@ class UILayerRound:
         self.remaining_hands_text.update(str(self.remaining_hands))
         self.remaining_discards = event.discards
         self.remaining_discards_text.update(str(self.remaining_discards))
+        self.money = event.money
+        self.money_text.update('$' + str(self.money))
 
     def handle_game_event(self, event: Any) -> None:
         handlers = {
@@ -122,3 +135,4 @@ class UILayerRound:
         self.round_score_text.draw(surf)
         self.remaining_hands_text.draw(surf)
         self.remaining_discards_text.draw(surf)
+        self.money_text.draw(surf)

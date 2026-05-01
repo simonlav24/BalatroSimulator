@@ -130,13 +130,16 @@ class Board:
     def get_jokers(self) -> list['Joker']:
         return self.jokers
     
-    def add_mult(self, mult: float):
+    def add_mult(self, mult: float) -> None:
         self.mult += mult
 
-    def add_chips(self, chips: int):
+    def add_chips(self, chips: int) -> None:
         self.chips += chips
 
-    def add_time_mult(self, mult: float):
+    def add_money(self, money: int) -> None:
+        self.data.money += money
+
+    def add_time_mult(self, mult: float) -> None:
         self.mult *= mult
     
     def get_mode(self) -> CalcMode:
