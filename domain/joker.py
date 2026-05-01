@@ -82,7 +82,7 @@ class Joker:
         elif self.data.edition == Edition.POLYCHROME:
             board.add_time_mult(1.5)
     
-    def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision) -> None:
         ...
     
     def on_sell(self, board: BoardVision) -> None:

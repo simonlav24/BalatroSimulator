@@ -24,10 +24,13 @@ def initialize_data() -> Director:
     for card in deck:
         new_card = factory.create_playing_card(card.rank, card.suit, enhancement=Enhancement.GOLD)
         player.add_card_to_deck(new_card)
-    player.add_joker(factory.create_joker_card(JokerReservedParking))
-    player.add_joker(factory.create_joker_card(JokerMime))
-    player.add_joker(factory.create_joker_card(JokerGoldenTicket))
-    player.add_joker(factory.create_joker_card(JokerRoughGem))
+    player.add_joker(factory.create_joker_card(JokerRamen))
+    player.add_joker(factory.create_joker_card(JokerFacelessJoker))
+    player.add_joker(factory.create_joker_card(JokerGreenJoker))
+    player.add_joker(factory.create_joker_card(JokerMailInRebate))
+    player.add_joker(factory.create_joker_card(JokerCastle))
+    player.add_joker(factory.create_joker_card(JokerHitTheRoad))
+    player.add_joker(factory.create_joker_card(JokerYorick))
 
     player.reset()
     player.shuffle()

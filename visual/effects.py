@@ -2,7 +2,7 @@
 from pygame import Color, Surface
 import pygame
 
-from core.utils import Vector2
+from core.utils import Vector2, format_float
 from core.event_bus import EventTriggerCard
 import visual.definitions as fonts
 from visual.definitions import FPS, Colors, CARD_SIZE
@@ -56,7 +56,7 @@ def create_trigger_effect(event: EventTriggerCard, reg: ViewRegistry, time_skew:
         text = f'+{event.mult} mult'
         color = Colors.RED
     elif event.time_mult > 1.0:
-        text = f'x{event.time_mult} mult'
+        text = f'x{format_float(event.time_mult)} mult'
         color = Colors.PURPLE
     elif event.money > 0:
         text = f'${event.money}'

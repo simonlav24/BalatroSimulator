@@ -121,6 +121,14 @@ class Board:
         self.play_initialize()
         return self.play()
 
+    def discard(self, cards: list[Card]) -> None:
+        for joker in self.jokers:
+            joker.trigger_on_discard_cards(cards, self)
+        for card in cards:
+            self.hand_cards.remove(card)
+            for joker in self.jokers:
+                joker.trigger_on_discard(card, self)
+
     def get_hand_cards(self) -> list[Card]:
         return self.hand_cards
     

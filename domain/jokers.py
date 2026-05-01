@@ -8,6 +8,7 @@ from domain.card import Card
 from domain.definitions import *
 from domain.poker import HandEvaluator
 
+from core.utils import format_float
 from core.event_bus import EventBus, EventTriggerCard, EventChangeEnhancement
 
 logger = logging.getLogger(__name__)
@@ -755,6 +756,12 @@ class JokerFacelessJoker(Joker):
         super().__init__(name='Faceless Joker', event_bus=event_bus)
         self.data.cost = 4
     
+    def trigger_on_discard_cards(self, cards: list[Card], board: BoardVision) -> None:
+        face_cards = sum(1 for card in cards if board.get_evaluation_rules().is_face_card(card))
+        if face_cards >= 3:
+            board.add_money(5)
+            self.event_bus.add_event(EventTriggerCard(self.id, money=5, halt=False))
+    
 
 class JokerGreenJoker(Joker):
     def __init__(self, event_bus: EventBus):
@@ -767,6 +774,10 @@ class JokerGreenJoker(Joker):
         self.event_bus.add_event(EventTriggerCard(self.id, custom_text='+1 mult'))
         super().trigger_on_start_hand(board)
     
+    def trigger_on_discard_cards(self, cards: list[Card], board: BoardVision) -> None:
+        self.mult = max(0, self.mult - 1)
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text='-1 mult', halt=False))
+
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         if self.mult > 0:
             board.add_mult(self.mult)
@@ -1094,6 +1105,13 @@ class JokerMailInRebate(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Mail-In Rebate', event_bus=event_bus)
         self.data.cost = 4
+        self.rank = Rank.KING
+    
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+        if card_discarded.is_rank(self.rank):
+            board.add_money(5)
+            self.event_bus.add_event(EventTriggerCard(self.id, money=5, halt=False))
+        super().trigger_on_discard(card_discarded, board)
 
 
 class JokerTotheMoon(Joker):
@@ -1290,20 +1308,17 @@ class JokerRamen(Joker):
         super().__init__(name='Ramen', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
-        self.discards_made = 200
+        self.discards_made = 100
     
-    def trigger_on_play_card(self, card: Card, board: BoardVision) -> None:
+    def trigger_on_end_hand(self, board: BoardVision) -> None:
         mult = 1 + self.discards_made * 0.01
         board.add_time_mult(mult)
         logger.info(f'{self.data.name} added {mult} time-mult')
         self.event_bus.add_event(EventTriggerCard(self.id, time_mult=mult))
-        super().trigger_on_play_card(card, board)
     
-    def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision) -> None:
         self.discards_made -= 1
-
-    def trigger_on_end_round(self, board: BoardVision) -> None:
-        self.suit = choice([Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS])
+        self.event_bus.add_event(EventTriggerCard(self.id, custom_text=f'x{format_float(1 + self.discards_made * 0.01)}', halt=False))
 
 
 class JokerWalkieTalkie(Joker):
@@ -1349,9 +1364,10 @@ class JokerCastle(Joker):
             self.event_bus.add_event(EventTriggerCard(self.id, chips=self.chips))
         super().trigger_on_end_hand(board)
     
-    def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision) -> None:
         if board.get_evaluation_rules().is_suit(card_discarded, self.suit):
             self.chips += 3
+            self.event_bus.add_event(EventTriggerCard(self.id, custom_text='+3 Chips', halt=False))
 
     def trigger_on_end_round(self, board: BoardVision) -> None:
         self.suit = choice([Suit.SPADES, Suit.HEARTS, Suit.DIAMONDS, Suit.CLUBS])
@@ -1497,6 +1513,7 @@ class JokerHangingChad(Joker):
 
     def retrigger_effect(self):
         self.event_bus.add_event(EventTriggerCard(self.id, custom_text='Again'))
+
 
 class JokerRoughGem(Joker):
     def __init__(self, event_bus: EventBus):
@@ -1729,10 +1746,11 @@ class JokerHitTheRoad(Joker):
         self.rarity = Rarity.RARE
         self.jacks = 0
     
-    def on_discard(self, card_discarded: Card, board: BoardVision):
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision):
         if card_discarded.get_rank() == Rank.JACK:
             self.jacks += 1
-        super().on_discard(card_discarded, board)
+            self.event_bus.add_event(EventTriggerCard(self.id, custom_text=f'x{format_float(1 + 0.5 * self.jacks)}', halt=False))
+        super().trigger_on_discard(card_discarded, board)
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         if self.jacks > 0:
@@ -1976,18 +1994,19 @@ class JokerYorick(Joker):
         self.discards_remaining = 23
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
-        if self.mult > 0:
+        if self.mult > 1:
             board.add_time_mult(self.mult)
             logger.info(f'{self.data.name} added {self.mult} time-mult')
             self.event_bus.add_event(EventTriggerCard(self.id, time_mult=self.mult))
         super().trigger_on_end_hand(board)
     
-    def on_discard(self, card_discarded: Card, board: BoardVision) -> None:
+    def trigger_on_discard(self, card_discarded: Card, board: BoardVision) -> None:
         self.discards_remaining -= 1
         if self.discards_remaining == 0:
-            self.discards_remaining += 1
+            self.discards_remaining = 23
             self.mult += 1
-        super().on_discard(card_discarded, board)
+            self.event_bus.add_event(EventTriggerCard(self.id, custom_text=f'x{self.mult}', halt=False))
+        super().trigger_on_discard(card_discarded, board)
 
 
 class JokerChicot(Joker):

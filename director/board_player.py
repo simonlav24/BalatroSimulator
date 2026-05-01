@@ -149,8 +149,7 @@ class BoardPlayer:
     def discard(self) -> None:
         # update domain
         selected_cards_ids = self.board_view.hand_row.get_selected()
-        for card in [self.data_reg[id] for id in selected_cards_ids]:
-            self.board.hand_cards.remove(card)
+        self.board.discard([self.data_reg[id] for id in selected_cards_ids])
 
         # update view
         # for card in [self.view_reg[id] for id in selected_cards_ids]:
