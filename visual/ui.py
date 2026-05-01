@@ -53,7 +53,7 @@ class Text(UIElement):
         self.scale = MotionVector(1.0)
     
     def update(self, text: str) -> None:
-        self.surf = fonts.fonts.small.render(text, False, WHITE)
+        self.surf = fonts.fonts.small.render(text, False, self.text_color)
     
     def step(self) -> None:
         self.angle.step()

@@ -75,27 +75,37 @@ class EventReorderCards:
 
 @dataclass
 class GameEventPlay:
-    is_handled: bool = False
+    ...
 
 @dataclass 
 class GameEventDiscard:
-    is_handled: bool = False
+    ...
 
 @dataclass 
 class GameEventChangedOrder:
-    is_handled: bool = False
+    ...
 
 @dataclass
 class GameEventChagnedSelection:
-    is_handled: bool = False
+    ...
 
 @dataclass
 class GameEventEndHand:
-    is_handled: bool = False
+    ...
 
 @dataclass
 class GameEventEndRound:
-    is_handled: bool = False
+    ...
+
+@dataclass
+class GameEventReset:
+    ...
+
+@dataclass
+class GameEventInitialize:
+    hands: int
+    discards: int
+    
 
 @dataclass
 class GameEventUpdateScore:
@@ -104,7 +114,6 @@ class GameEventUpdateScore:
     time_mult: float = 1.0
     absolute: bool = False
     hand_info: tuple[str, int] = (None, None)
-    is_handled: bool = False
 
 
 
@@ -125,7 +134,6 @@ class EventBus:
         return events
 
     def get_game_events(self) -> list[Any]:
-        return self.game_events
-
-    def step(self) -> None:
-        self.game_events = [event for event in self.game_events if not event.is_handled]
+        events = self.game_events.copy()
+        self.game_events.clear()
+        return events

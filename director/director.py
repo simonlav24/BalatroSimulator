@@ -3,7 +3,7 @@
 from domain.board import Board
 from domain.factory import Factory
 
-from core.event_bus import EventBus
+from core.event_bus import EventBus, GameEventReset
 from core.data_registry import DataRegistry
 
 from visual.view_registry import ViewRegistry
@@ -45,13 +45,15 @@ class Director:
 
     def get_player(self) -> BoardPlayer:
         return self.board_player
+
+    def new_game(self) -> None:
+        self.event_bus.add_game_event(GameEventReset())
     
     def step(self) -> None:
         for event in self.event_bus.get_game_events():
             self.board_player.handle_game_event(event)
             if self.ui_layer:
                 self.ui_layer.handle_game_event(event)
-        self.event_bus.step()
 
         self.input_system.step()
         self.board_view.step()

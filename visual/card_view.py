@@ -9,7 +9,7 @@ from visual.definitions import *
 
 SPRING_FORCE = 80.0
 SPRING_DAMP = 10.0
-TIME_SCALE = 0.03
+TIME_SCALE = 0.04
 
 
 class MotionVector:

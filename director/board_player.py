@@ -17,6 +17,8 @@ from core.event_bus import (
     GameEventChangedOrder,
     GameEventChagnedSelection,
     GameEventUpdateScore,
+    GameEventReset,
+    GameEventInitialize,
 )
 from core.data_registry import DataRegistry
 from domain.board import Board
@@ -46,29 +48,40 @@ class BoardPlayer:
     def shuffle(self) -> None:
         shuffle(self.board.remaining_deck)
 
+    def _handle_play(self, event: GameEventPlay) -> None:
+        self.play()
+        self.draw_cards()
+        self.flush_animation()
+
+    def _hadnle_discard(self, event: GameEventDiscard) -> None:
+        self.discard()
+        self.draw_cards()
+        self.flush_animation()
+
+    def _handle_change_order(self, event: GameEventChangedOrder) -> None:
+        self.sync_to_domain()
+        self.board_view.recalculate_positions()
+    
+    def _handle_change_selection(self, event: GameEventChagnedSelection) -> None:
+        hand_info, chips, mult = self.board.get_initial_score([self.data_reg[card.id] for card in self.board_view.hand_row.cards if card.is_selected])
+        self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True, hand_info=hand_info))
+
+    def _handle_reset(self, event: GameEventReset) -> None:
+        initialize_event = GameEventInitialize(self.board.data.remaining_hands, self.board.data.remaining_discards)
+        self.event_bus.add_game_event(initialize_event)
+
+
     def handle_game_event(self, event) -> None:
-        if isinstance(event, GameEventPlay):
-            self.play()
-            self.draw_cards()
-            self.flush_animation()
-            event.is_handled = True
-        
-        elif isinstance(event, GameEventDiscard):
-            self.discard()
-            self.draw_cards()
-            self.flush_animation()
-            event.is_handled = True
-        
-        elif isinstance(event, GameEventChangedOrder):
-            self.sync_to_domain()
-            print('synced to domain')
-            self.board_view.recalculate_positions()
-            event.is_handled = True
-        
-        elif isinstance(event, GameEventChagnedSelection):
-            hand_info, chips, mult = self.board.get_initial_score([self.data_reg[card.id] for card in self.board_view.hand_row.cards if card.is_selected])
-            self.event_bus.add_game_event(GameEventUpdateScore(chips=chips, mult=mult, absolute=True, hand_info=hand_info))
-            event.is_handled = True
+        handlers = {
+            GameEventPlay: self._handle_play,
+            GameEventDiscard: self._hadnle_discard,
+            GameEventChangedOrder: self._handle_change_order,
+            GameEventChagnedSelection: self._handle_change_selection,
+            GameEventReset: self._handle_reset,
+        }
+        handler = handlers.get(type(event))
+        if handler:
+            handler(event)
             
 
     def draw_cards(self, amount: int=-1) -> None:

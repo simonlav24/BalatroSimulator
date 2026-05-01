@@ -24,8 +24,7 @@ def initialize_data() -> Director:
     for card in deck:
         new_card = factory.create_playing_card(card.rank, card.suit)
         player.add_card_to_deck(new_card)
-    player.add_joker(factory.create_joker_card(JokerPhotograph))
-    player.add_joker(factory.create_joker_card(JokerHangingChad))
+    player.add_joker(factory.create_joker_card(JokerDusk))
 
     player.reset()
     player.shuffle()
@@ -51,12 +50,13 @@ def main():
     player = director.get_player()
 
     director.initialize_round_ui()
+    director.new_game()
 
     # Main loop
     done = False
     while not done:
         clock.tick(FPS)
-        
+
         for event in pygame.event.get():
             director.input_system.handle_event(event)
 
@@ -68,13 +68,13 @@ def main():
 
             if (event.type == pygame.QUIT) or (event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE):
                 done = True
-        
+
         # step
         director.step()
 
         # draw
         win.fill((0, 0, 0))
-        
+
         director.renderer.draw(win)
 
 
