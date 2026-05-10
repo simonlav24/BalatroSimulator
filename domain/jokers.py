@@ -17,6 +17,7 @@ class JokerJimbo(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Joker', event_bus=event_bus)
         self.data.cost = 2
+        self.description = '<red>+4<cls> Mult'
 
     def trigger_on_end_hand(self, board: BoardVision):
         board.add_mult(4)
@@ -29,6 +30,7 @@ class JokerGreedy(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Greedy Joker', event_bus=event_bus)
         self.data.cost = 5
+        self.description = 'Played cards with <suit>Diamond suit give <red>+3<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.DIAMONDS):
@@ -42,6 +44,7 @@ class JokerLusty(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Lusty Joker', event_bus=event_bus)
         self.data.cost = 5
+        self.description = 'Played cards with <suit>Heart suit give <red>+3<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.HEARTS):
@@ -55,6 +58,7 @@ class JokerWrathful(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Wrathful Joker', event_bus=event_bus)
         self.data.cost = 5
+        self.description = 'Played cards with <suit>Spade suit give <red>+3<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.SPADES):
@@ -68,6 +72,7 @@ class JokerGluttonous(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Gluttonous Joker', event_bus=event_bus)
         self.data.cost = 5
+        self.description = 'Played cards with <suit>Club suit give <red>+3<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.is_suit(Suit.CLUBS):
@@ -81,6 +86,7 @@ class JokerJollyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Jolly Joker', event_bus=event_bus)
         self.data.cost = 3
+        self.description = '<red>+8<cls> Mult if played hand contains a <yellow>Pair'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -95,6 +101,7 @@ class JokerZanyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Zany Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+12<cls> Mult if played hand contains a <yellow>Three of a Kind'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -109,6 +116,7 @@ class JokerMadJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Mad Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+10<cls> Mult if played hand contains a <yellow>Two Pair'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -123,6 +131,7 @@ class JokerCrazyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Crazy Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+12<cls> Mult if played hand contains a <yellow>Straight'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -137,6 +146,7 @@ class JokerDrollJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Droll Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+10<cls> Mult if played hand contains a <yellow>Flush'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -151,6 +161,7 @@ class JokerSlyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Sly Joker', event_bus=event_bus)
         self.data.cost = 3
+        self.description = '<blue>+50<cls> Chips if played hand contains a <yellow>Pair'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -165,6 +176,7 @@ class JokerWilyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Wily Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<blue>+100<cls> Chips if played hand contains a <yellow>Three of a Kind'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -179,6 +191,7 @@ class JokerCleverJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Clever Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<blue>+80<cls> Chips if played hand contains a <yellow>Two Pair'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -193,6 +206,7 @@ class JokerDeviousJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Devious Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<blue>+100<cls> Chips if played hand contains a <yellow>Straight'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -207,6 +221,7 @@ class JokerCraftyJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Crafty Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<blue>+80<cls> Chips if played hand contains a <yellow>Flush'
 
     def trigger_on_end_hand(self, board: BoardVision):
         evaluator = HandEvaluator(board.get_played_cards(), board.get_evaluation_rules())
@@ -221,6 +236,7 @@ class JokerHalfJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Half Joker', event_bus=event_bus)
         self.data.cost = 5
+        self.description = '<red>+20<cls> Mult if played hand contains <yellow>3<cls> or fewer cards'
 
     def trigger_on_end_hand(self, board: BoardVision):
         if len(board.get_selected_cards()) <= 3:
@@ -235,9 +251,18 @@ class JokerStencil(Joker):
         super().__init__(name='Joker Stencil', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.UNCOMMON
+        self.description = '<mult>X1</mult> Mult for each empty <yellow>Joker<cls> slot<br>Joker Stencil included<br><gray>(Currently <mult>{mult}</mult>)'
+
+    def count_mult(self, board: BoardVision) -> int:
+        mult = board.get_data().joker_spaces
+        for joker in board.get_jokers():
+            if isinstance(joker, JokerStencil):
+                continue
+            mult -= 1
+        return mult
 
     def trigger_on_end_hand(self, board: BoardVision):
-        mult = board.get_data().joker_spaces - len(board.get_jokers())
+        mult = self.count_mult(board)
         if mult > 1:
             board.add_time_mult(mult)
             logger.info(f'{self.data.name} added {mult} time-mult')
@@ -250,6 +275,7 @@ class JokerFourFingers(Joker):
         super().__init__(name='Four Fingers', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
+        self.description = 'All <yellow>Flushes<cls> and <yellow>Straights<cls> can be made with 4 cards '
 
     def change_evaluation_rules(self, board: BoardVision):
         board.get_evaluation_rules().fingers = 4
@@ -260,6 +286,7 @@ class JokerMime(Joker):
         super().__init__(name='Mime', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Retrigger all card <yellow>held in hand<cls> abilities'
     
     def get_hand_card_retriggers(self, card: Card, board: BoardVision) -> int:
         return 1
@@ -272,6 +299,7 @@ class JokerCreditCard(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Credit Card', event_bus=event_bus)
         self.data.cost = 1
+        self.description = 'Go up to <red>-$20<cls> in debt'
 
 
 class JokerCeremonialDagger(Joker):
@@ -279,6 +307,7 @@ class JokerCeremonialDagger(Joker):
         super().__init__(name='Ceremonial Dagger', event_bus=event_bus)
         self.data.cost = 6
         self.mult = 0
+        self.description = 'When <yellow>Blind<cls> is selected, destroy Joker to the right and permanently add <yellow>double<cls> its sell value to this <red>Mult<cls><br><gray>(Currently <red>+{mult}<cls> Mult)<cls>'
 
     def trigger_on_end_hand(self, board: BoardVision):
         board.add_mult(self.mult)
@@ -291,6 +320,7 @@ class JokerBanner(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Banner', event_bus=event_bus)
         self.data.cost = 5
+        self.description = '<blue>+30<cls> Chips for each remaining <orange>discard<cls>'
 
     def trigger_on_end_hand(self, board: BoardVision):
         chips = board.get_data().remaining_discards * 30
@@ -304,6 +334,7 @@ class JokerMysticSummit(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Mystic Summit', event_bus=event_bus)
         self.data.cost = 5
+        self.description = '<red>+15<cls> Mult when <orange>0<cls> discards remaining'
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         if board.get_data().remaining_discards == 0:
@@ -318,6 +349,7 @@ class JokerMarbleJoker(Joker):
         super().__init__(name='Marble Joker', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Adds one <orange>Stone<cls> card to the deck when <orange>Blind<cls> is selected'
 
 
 class JokerLoyaltyCard(Joker):
@@ -326,6 +358,7 @@ class JokerLoyaltyCard(Joker):
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
         self.count = 1
+        self.description = '<b><xmult>X4<cls> Mult</b> every <orange>6<cls> hands played<br /><gray>5 remaining<cls>'
     
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         self.count -= 1
@@ -341,12 +374,14 @@ class Joker8Ball(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='8 Ball', event_bus=event_bus)
         self.data.cost = 5
+        self.description = '<green>1 in 4<cls> chance for each played <orange>8<cls> to create a <purple>Tarot<cls> card when scored<br /><gray>(Must have room)<cls>'
 
 
 class JokerMisprint(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Misprint', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+0-23<cls> Mult'
 
     def trigger_on_end_hand(self, board: BoardVision):
         mode = board.get_mode()
@@ -368,6 +403,7 @@ class JokerDusk(Joker):
         super().__init__(name='Dusk', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Retrigger all played cards in <orange>final hand<cls> of the round'
 
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         if board.get_data().remaining_hands == 0:
@@ -382,6 +418,7 @@ class JokerRaisedFist(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='RaisedFist', event_bus=event_bus)
         self.data.cost = 5
+        self.description = 'Adds <orange>double<cls> the rank of <orange>lowest<cls> ranked card held in hand to Mult'
 
     def _is_card_min(self, card: Card, cards: list[Card]) -> bool:
         cards = [card for card in cards if card.get_rank() != Rank.NONE]
@@ -410,6 +447,7 @@ class JokerChaosTheClown(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Chaos the Clown', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<orange>1<cls> free <green>Reroll<cls> per shop'
 
 
 class JokerFibonacci(Joker):
@@ -417,6 +455,7 @@ class JokerFibonacci(Joker):
         super().__init__(name='Fibonacci', event_bus=event_bus)
         self.data.cost = 8
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Each played <orange>Ace<cls>, <orange>2<cls>, <orange>3<cls>, <orange>5<cls>, or <orange>8<cls> gives <red>+8<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.get_rank() in [Rank.TWO, Rank.THREE, Rank.FIVE, Rank.EIGHT, Rank.ACE]:
@@ -432,6 +471,7 @@ class JokerSteelJoker(Joker):
         super().__init__(name='Steel Joker', event_bus=event_bus)
         self.data.cost = 7
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Gives <b><xmult>X0.2<cls> Mult</b> for each <orange>Steel Card<cls> in your <orange>full deck<cls> <br> <gray>(Currently <b><xmult>X{mult}<cls> Mult</b>)<cls>'
 
     def trigger_on_end_hand(self, board: BoardVision):
         steel_cards = [card for card in board.get_full_deck() if card.data.enhancement == Enhancement.STEEL]
@@ -447,6 +487,7 @@ class JokerScaryFace(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Scary Face', event_bus=event_bus)
         self.data.cost = 4
+        self.description = 'Played <orange>face<cls> cards give <blue>+30<cls> Chips when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if board.get_evaluation_rules().is_face_card(card):
@@ -460,6 +501,10 @@ class JokerAbstractJoker(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Abstract Joker', event_bus=event_bus)
         self.data.cost = 4
+        self.description = '<red>+3<cls> Mult for each <orange>Joker<cls> card<br><gray>(Currently <red>{mult}<cls> Mult)<cls>'
+
+    def get_description(self, board: BoardVision) -> str:
+        return self.description.format(mult = 3 * len(board.get_jokers()))
 
     def trigger_on_end_hand(self, board: BoardVision):
         mult = 3 * len(board.get_jokers())
@@ -473,6 +518,7 @@ class JokerDelayedGratification(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Delayed Gratification', event_bus=event_bus)
         self.data.cost = 4
+        self.description = 'Earn <b><yellow>$2<cls></b> per <orange>discard<cls> if no discards are used by end of the round'
 
 
 class JokerHack(Joker):
@@ -480,6 +526,7 @@ class JokerHack(Joker):
         super().__init__(name='Hack', event_bus=event_bus)
         self.data.cost = 6
         self.rarity = Rarity.UNCOMMON
+        self.description = 'Retrigger each played <orange>2<cls>, <orange>3<cls>, <orange>4<cls>, or <orange>5<cls>'
 
     def get_card_retriggers(self, card: Card, board: BoardVision) -> int:
         if card.get_rank() in [Rank.TWO, Rank.THREE, Rank.FOUR, Rank.FIVE]:
@@ -495,6 +542,7 @@ class JokerPareidolia(Joker):
         super().__init__(name='Pareidolia', event_bus=event_bus)
         self.data.cost = 5
         self.rarity = Rarity.UNCOMMON
+        self.description = 'All cards are considered <orange>face<cls> cards'
 
     def change_evaluation_rules(self, board: BoardVision) -> None:
         board.get_evaluation_rules().all_face = True
@@ -504,6 +552,7 @@ class JokerGrosMichel(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Gros Michel', event_bus=event_bus)
         self.data.cost = 5
+        self.description = '<red>+15<cls> Mult<br><green>1 in 6<cls> chance this card is destroyed at end of round'
 
     def trigger_on_end_hand(self, board: BoardVision) -> None:
         board.add_mult(15)
@@ -516,6 +565,7 @@ class JokerEvenSteven(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Even Steven', event_bus=event_bus)
         self.data.cost = 4
+        self.description = 'Played cards with <orange>even<cls> rank give <red>+4<cls> Mult when scored <br> <gray>(10, 8, 6, 4, 2)<cls>'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.get_rank() in [Rank.TWO, Rank.FOUR, Rank.SIX, Rank.EIGHT, Rank.TEN]:
@@ -529,6 +579,7 @@ class JokerOddTodd(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Odd Todd', event_bus=event_bus)
         self.data.cost = 4
+        self.description = 'Played cards with <orange>odd<cls> rank give <blue>+31<cls> Chips when scored <br> <gray>(A, 9, 7, 5, 3)<cls>'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.get_rank() in [Rank.ACE, Rank.THREE, Rank.FIVE, Rank.SEVEN, Rank.NINE]:
@@ -542,6 +593,7 @@ class JokerScholar(Joker):
     def __init__(self, event_bus: EventBus):
         super().__init__(name='Scholar', event_bus=event_bus)
         self.data.cost = 4
+        self.description = 'Played <orange>Aces<cls> give <blue>+20<cls> Chips and <red>+4<cls> Mult when scored'
 
     def trigger_on_play_card(self, card: Card, board: BoardVision):
         if card.get_rank() == Rank.ACE:

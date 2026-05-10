@@ -22,6 +22,8 @@ class Fonts:
         self.small = pygame.font.Font(font_path, 24)
         self.medium = pygame.font.Font(font_path, 40)
         self.large = pygame.font.Font(font_path, 56)
+        self.joker_title = pygame.font.Font(font_path, 24)
+        self.joker_description = pygame.font.Font(font_path, 16)
 
 fonts: Fonts | None = None
 
@@ -229,8 +231,10 @@ class UIRatios:
     PLAY_BUTTON_OFFSET_2 = win_size.elementwise() * Vector2(0.6, 0.83)
 
 class Colors:
-    WHITE = (255, 255, 255)
+    WHITE = (253, 253, 253)
     BLUE = (0, 147, 254)
     RED = (254, 76, 64)
     YELLOW = (254, 152, 0)
     PURPLE = (119, 122, 217)
+    LIGHT_GRAY = (214, 213, 223)
+    DARK_GRAY = (63, 74, 76)

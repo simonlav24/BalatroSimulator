@@ -43,7 +43,11 @@ class Joker:
         self.active: bool = True
         self.rarity: Rarity = Rarity.COMMON
         self.event_bus = event_bus
+        self.description: str = ''
     
+    def get_description(self) -> str:
+        return self.description
+
     def __repr__(self):
         return self.data.name
 
